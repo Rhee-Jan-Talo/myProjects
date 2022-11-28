@@ -1,0 +1,70 @@
+{% extends 'navbar.html' %} 
+{% block content %}{% load filters %}
+
+
+{% if rf_form.errors %}
+	ul>
+	{% for error in rf_form.errors %} 
+	<script>alert("Error missing: {{ error }}");</script>
+	{% endfor %}
+	</ul>
+{% endif %}  
+{% if messages %}
+<div >
+	{% for message in messages %}
+	{% if message %}
+		<script>alert("{{ message }}");</script>
+	{% endif %}
+	{% endfor %}
+</div>
+{% endif %} 
+<style>
+	label{
+		font-size: 17px;
+		font-weight: bold;
+	}
+	.button_admin{
+		background-color: #378DFC;
+		font-weight: bold;
+		padding: 7px 8px 7px 8px;
+		
+	}
+
+	center{
+		font-size: 17px;
+	}
+	.admin_left{
+		margin-left: 90px;
+	}
+
+	.cool_form input[type="submit"] {
+	  color: black;
+	  font-weight: bold;
+	  background: #D9E3F1;
+	}
+</style>
+<br>
+<center>ADD REFUND</center>
+<div class="admin-container">
+<div class="admin_left">
+<form class="cool_form" method="POST">{% csrf_token %}
+	{% for things in data %}
+	<input type=search name="f_order_id" value="{{ f_order_id }} "hidden/>
+
+	<p><label>Order ID:</label>
+	<input type=search value="{{ things.u_order_id }}" readonly/></p>
+
+	<p><label>Date From</label>
+	<input type="date" name="date_from"/></p>
+
+	<p><label>Date to</label>
+	<input type="date" name="date_to"/></p>
+
+	<p><label>Refund Percentage</label>
+	<input type=number max="100"  name="refund_percentage"/></p>
+	{% endfor %}
+	<input type="submit" style="background: #378DFC; margin-bottom: 70px;"value="Submit"></input>
+</form>
+</div>
+</div>
+{%endblock%}

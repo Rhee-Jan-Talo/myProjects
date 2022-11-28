@@ -1,0 +1,253 @@
+{% extends 'navbar.html' %} 
+{% block content %}{% load filters %}
+
+
+<center><h2>UPDATE ORDER DETAILS</h2></center>
+<!--
+{{ data }}<br><br>
+{{ delivery_info}}<br><br>
+{{ payment_methods }}<br><br>
+{{refund_details}}
+<br><br> -->
+
+{% if form.errors %}
+	ul>
+	{% for error in form.errors %} 
+	<script>alert("Error missing: {{ error }}");</script>
+	{% endfor %}
+	</ul>
+{% endif %}  
+{% if messages %}
+<div >
+	{% for message in messages %}
+	{% if message %}
+		<script>alert("{{ message }}");</script>
+	{% endif %}
+	{% endfor %}
+</div>
+{% endif %}  
+<style>
+	label{
+		font-size: 17px;
+		font-weight: bold;
+	}
+	.button_admin{
+		background-color: #378DFC;
+		font-weight: bold;
+		padding: 7px 8px 7px 8px;
+		
+	}
+
+	center{
+		font-size: 17px;
+	}
+</style>
+{% if data %}
+<div class="admin-container">
+	<div class="admin_left">
+		<form class="cool_form" method="POST">{% csrf_token %}
+	{% for things in data %}
+		
+		
+		<center>ORDER DETAILS</center><br>
+		<p><label> Order ID:</label>
+		<input type="search" value = "{{ things.u_order_id }}" name="u_order_id" readonly /></input></p>
+
+		<p><label> Harvest ID:</label>
+		<input type="search" value = "{{ things.harvest_id }}" name="harvest_id" readonly /></input></p>
+
+		<p><label> Plant Name:</label>
+		<input type="search" value = "{{ things.plant_name }}" name="plant_name" readonly /></input></p>
+
+		<p><label> Requested Quantity:</label>
+		<input type="search" value = "{{ things.quantity|quan_format }} {{ things.units }}" readonly /></input></p>
+
+		<p><label> Grade:</label>
+		<input type="search" value = "{{ things.grade }}" readonly /></input></p>
+
+		<p><label> Current Quantity Remaning:</label>
+		<input type="search" value="{{ things.quantity_harvested|quan_format }} {{ things.units }}" readonly/> </input></p>
+
+		<p><label> Confirmed Quantity: </label>
+		<input type="search" id="quan" name="confirmed_quantity" value="{{things.confirmed_quantity|quan_format}} {{ things.units }}"readonly/></input></p>
+
+		<input type="search" id="quan_total" value="{{things.quantity_harvested}}" hidden/></input>
+		
+
+
+
+		<p><label> Total Amount: </label>
+		<input type="search" id="total" name="total_amount" value="{{ things.total_amount|money_format }}" readonly></input>
+		</p>
+
+
+
+		<br><hr class="solid"/><br>
+		<center>DOWNPAYMENT DETAILS</center><br>
+		<p><label> Downpayment Amount(25% Fixed):</label>
+		<input type="search"  name="total_downpayment" value="{{things.total_downpayment|money_format}}"readonly /></input></p>
+
+		<p><label> Downpayment Due: </label>
+		<input type="date" name="dp_due" value="{{ things.dp_due }}" readonly/></input></p>
+
+		<br><hr class="solid"/><br>
+		<center>DELIVERY DETAILS</center><br>
+		<p><label> Requested Date Arrival:</label>
+		<input type="search" value = " {{ things.date_needed|date_format }}" name="batch_id" readonly /></input></p>
+
+		<p><label> Expected Date Arrival:</label>
+		<input type="search"value="{{things.expected_date_arrival|date_format}}" readonly/></input></p>
+
+		<p><label> Delivery Fee: </label>
+		<input type="search"  id="delivery_fee" name="delivery_fee" value="{{things.delivery_fee|money_format }}"readonly /></input></p>
+
+		<p><label> Total Payables Left:</label>
+		<input type="search"  name="balance_to_pay" value="{{things.balance_to_pay|money_format }}"readonly /></input>
+		</p>
+		<br><hr class="solid"/><br>
+	</div>
+	<div  class="admin_right">
+		<center>REFUND DETAILS</center><br>
+		{% if refund_details %}
+			
+			<div class="admin-table">
+			<table class="table-striped">
+				<thead>
+					<th>Date from</th>
+					<th>Date to</th>
+					<th>Refund Percentage</th>
+					
+				</thead>
+				<tbody>
+					{% for i in refund_details %}
+					<td>{{ i.date_from|date_format }}</td>
+					<td>{{ i.date_to|date_format }}</td>
+					<td>{{ i.refund_percentage }}</td>
+				
+
+				</tbody>
+					{% endfor %}
+			</table>
+			</div>
+		{% else %}
+			<p><i style="color: red">No Refund Details recorded for this order yet</i></p>
+			<a href="{% url 'add_refund' things.f_order_id %}" class="button_admin">CREATE REFUND DETAILS</a>
+			<br><br>
+		{% endif %}
+		<br><hr class="solid"/><br>
+		<center>PAYMENT METHODS DETAILS</center><br>
+		{% if payment_methods %}
+			{% for k in payment_methods %}
+				{% if k.is_selected == 1%}
+					<p>User paid using <b>{{k.payment_method}}</b> please click the button to show full details</p>
+					<p>Total Amount Paid: <b>{{ k.total_amount_paid|money_format }}</b></p>
+					{% if things.dp_paid|to_float == 1 %}
+					<p>Down Payment Status: <b>PAID</b></p>
+					{% else %}
+					<p>Down Payment Status: <b>NOT ENOUGH PAYMENT</b></p>
+					{% endif %}
+
+					{% if things.fp_paid|to_float == 1 %}
+					<p>Full Payment Status: <b>PAID</b></p>
+					{% else %}
+					<p>Full Payment Status: <b>NOT ENOUGH PAYMENT</b></p>
+					{% endif %}		
+
+					
+				{% endif %}
+			{% endfor %}
+			{% for j in payment_methods %}
+				<a href="{% url 'update_payment_method' j.p_id %}" class="button_admin">{{ j.payment_method }}</a> 
+			{% endfor %}
+			<br><br>
+			<p><a href="{% url 'add_payment_method' things.f_order_id %}" class="button_admin">ADD MORE PAYMENT METHODS</a></p>
+		{% else %}
+			
+		<p><i style="color: red">No Payment Methods recorded for this order yet</i></p>
+			<p><a href="{% url 'add_payment_method' things.f_order_id %}" class="button_admin">ADD PAYMENT METHODS</a></p>
+			<br><br>
+		{% endif %}
+		<br><hr class="solid"/><br>
+		<center>DELIVERY INFO DETAILS</center><br>
+		{% if things.fp_paid|to_float == 1 %}
+			<p>Order is fully paid, you can now process the delivery</p>
+		{% else %}
+			<p><i style="color: red">Note: User is not fully paid in this order, don't process the delivery yet</i></p>
+		{% endif %}	
+
+		{% if things.dp_paid == "1" %}
+		{% if delivery_info %}
+			{% for iii in delivery_info %}
+			<p>Delivery Status: <b>{{ iii.delivery_status }}</b></p>
+			<p>Customer Name: <b>{{ iii.customer_name }}</b></p>
+			<p>Contact Information: <b>{{ iii.contact_info }}</b></p>
+			<p>Shipping Address: <b>{{ iii.shipping_address }}</b></p>
+			<br>
+			{% if is_paid %}
+			<a href="{% url 'view_delivery_info' things.f_order_id u_order_id %}" class="button_admin">UPDATE OR VIEW DELIVERY INFO</a><br><br>
+			{% else %}
+			<a href="{% url 'view_delivery_info' things.f_order_id u_order_id %}" onclick="return confirm('User is not fully paid in this order yet, you sure you want to continue?');" class="button_admin">UPDATE OR VIEW DELIVERY INFO</a><br><br>
+			<br><br>
+			{% endif %}
+			{% endfor %}
+		{% else %}
+			<p><i style="color: red">No Delivery Info recorded for this order yet</i></p>
+			{% if is_paid %}
+			<a href="{% url 'add_delivery_info' things.f_order_id %}" class="button_admin">ADD DELIVERY INFO</a>
+			{% else %}
+			<a href="{% url 'add_delivery_info' things.f_order_id %}" onclick="return confirm('User is not fully paid in this order yet, you sure you want to continue?');" class="button_admin">ADD DELIVERY INFO</a>
+			<br><br>
+			{% endif %}
+		{% endif %}
+		{% else %}
+		<p><i style="color: red">User needs to pay for the Downpayment before you can process the Delivery</i></p>
+		{% endif %}
+	{% endfor %}
+	</div>
+	</form>
+</div>
+{% elif data_declined %}
+<div class="admin-container">
+	<div class="admin_left">
+		<div class="cool_form">
+		{% for things2 in data_declined %}
+		<p><label> Order ID:</label>
+		<input type="search" value = "{{ things2.u_order_id }}" name="u_order_id" readonly /></input></p>
+
+		<p><label> Harvest ID:</label>
+		<input type="search" value = "{{ things2.harvest_id }}" name="harvest_id" readonly /></input></p>
+
+		<p><label> Plant Name:</label>
+		<input type="search" value = "{{ things2.plant_name }}" name="plant_name" readonly /></input></p>
+
+		<p><label> Requested Quantity:</label>
+		<input type="search" id="rq" value = "{{ things2.quantity }}" readonly /></input></p>
+
+		<p><label> Grade:</label>
+		<input type="search" value="{{ things2.grade }}" readonly/> </input></p>
+
+		<p><label> Current Quantity Remaning:</label>
+		<input type="search" value="{{ things2.quantity_harvested }} {{ things2.units }}" readonly/> </input></p>
+
+		<p><label> Confirmed Quantity: * </label>
+		<input type="number" id="quan" value="0" required/></input></p>
+
+		<input type="search" id="quan_total" value="{{things2.quantity_harvested}}" hidden/></input>
+		<p><label> Units:</label>
+		<input type="search" id="unit" value = "{{ things2.units }}" name="units" readonly /></input></p>
+
+		<p><label> Price per Unit:</label>
+		<input type="search" id="ppu" value = "{{ things2.price_per_unit }}" readonly /></input></p>
+
+		<p><label> Total Amount: *</label>
+		<input type="search" id="total" value="0" readonly/></input>
+
+		<p><label> Reason Declined: *</label>
+		<input type="search" id="total" value="{{ things2.request_decline_reason}}" readonly/></input>
+		{% endfor %}
+
+		</div>
+	</div>
+</div>
+{% endif %}
+{%endblock%}

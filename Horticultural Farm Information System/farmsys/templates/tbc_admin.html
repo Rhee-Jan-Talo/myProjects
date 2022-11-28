@@ -1,0 +1,72 @@
+{% extends 'navbar.html' %} 
+{% block content %}
+{% load filters %}
+{% if messages %}
+<div >
+	{% for message in messages %}
+	{% if message %}
+		<script>alert("{{ message }}");</script>
+	{% endif %}
+	{% endfor %}
+</div>
+{% endif %} 
+<style>
+input{text-indent: 5px;width: 260px !important;}.right{float: right; margin-right: 45px;}
+</style>
+<center><h2>Your Orders</h2></center>
+<center><p>To be Confirm by Admin</p></center>
+
+
+<main class="container-d" >
+{% if data %}
+<a href="{% url 'tabular_form' 'tbc_admin' %}" class="tabular_button">View in Tabular Form</a>
+
+<div style="" class="cool_form-r right">
+<input type="text" id="myInput" onkeyup="myFunction()" placeholder="Search for plant names.." title="Type in a name"><i class="fa fa-search" aria-hidden="true"></i>
+</div><br><br>
+<div class="d-flex flex-wrap" id="myTable">
+	{% for things in data %}
+	<div class="items">
+    <a class="click-dis" href="{% url 'tbc_admin_details' things.u_order_id %}">
+    <div class="i-container">
+	    <div class="main-title">
+	    	<img src="{{ things.batch_img_imgur }}" >
+	    	<p class="main-title">{{ things.plant_name }}</p>
+	    </div>
+	    <div class ="sub-details">
+	    	
+	    	{% if things.is_admin_approved == 1 %}
+	    	<p>Admin Confirmation: <b>Accepted</b></p>
+	    	{% elif things.is_admin_approved == 2 %}
+	    	<p>Admin Confirmation: <b>Rejected</b></p>
+	    	{% else %}
+	    	<p>Admin Confirmation: <b>No response</b></p>
+	    	{% endif %}
+	    </div>     
+    </div> 
+    </a> 
+	</div>
+    {% endfor %}
+    
+    {% else %}
+    <center>--- No orders to be confirmed by admin ---</center>
+    {% endif %}
+</div>  
+</main>   
+<script>
+function myFunction() {
+  var input = document.getElementById("myInput");
+  var filter = input.value.toLowerCase();
+  var nodes = document.getElementsByClassName('items');
+  for (i = 0; i < nodes.length; i++) {
+    if (nodes[i].innerText.toLowerCase().includes(filter)) {
+      nodes[i].style.display = "block";
+    } else {
+      nodes[i].style.display = "none";
+    }
+  }
+}
+</script>
+{%endblock%}
+
+

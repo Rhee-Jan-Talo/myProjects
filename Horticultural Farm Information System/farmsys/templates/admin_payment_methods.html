@@ -1,0 +1,118 @@
+{% extends 'navbar.html' %} 
+{% block content %}{% load filters %}
+{% if messages %}
+<div >
+	{% for message in messages %}
+	{% if message %}
+		<script>alert("{{ message }}");</script>
+	{% endif %}
+	{% endfor %}
+</div>
+{% endif %}  
+
+
+<center><h2>Payment Methods</h2></center>
+{% if data %}
+<a href="{% url 'add_admin_payment_method' 'add' '0' %}" class="button_admin">Add new Payment Method</a>
+<br><br>
+<form method="POST">{% csrf_token %}
+  <div class="search-container" >
+	<input type="text" id="myInput" onkeyup="myFunction()" placeholder="Search for methods.." title="Type in a name">
+	<input type="text" id="myInput2" onkeyup="myFunction2()" placeholder="Search for numbers.." title="Type in a name">
+	<input type="text" id="myInput3" onkeyup="myFunction3()" placeholder="Search for names.." title="Type in a name">	
+  <i class="fa fa-search" aria-hidden="true"></i>
+  <div class="right-container">
+  <label>Group by:</label>
+	<button class="button_admin" type="submit" name="submit" value="account_name">Account Name</button>
+	<button class="button_admin" type="submit" name="submit" value="account_number">Account Number</button>
+	<button class="button_admin" type="submit" name="submit" value="payment_method">Payment Method</button>
+	<i class="fa fa-filter" aria-hidden="true"></i>
+  </div>
+</div>
+<form><br><br>
+<div>
+  <div class="admin-table">
+  <table class="table-striped" id="myTable">
+    <thead>
+    <tr>
+      <th>Payment Method</th>
+      <th>Account Number</th>
+      <th>Account Name</th>
+      <th>Action</th>
+    </tr>
+    </thead>
+    {% for things in data %}
+    <tbody>
+      <td>{{ things.payment_method }}</td>
+      <td>{{ things.account_number }}</td>
+      <td>{{ things.account_name }}</td>
+      <td><a href="{% url 'add_admin_payment_method' 'edit' things.id %}" class="button_admin">Edit</a></td>
+    </tbody>
+    {% endfor %}
+  </table>
+</div>
+</div>
+
+{% else %}
+<center><p><i style="color:Red">No payment methods data available</i></p>
+<br><a href="{% url 'add_admin_payment_method' 'add' '0' %}" class="button_admin">Add new Payment Method</a></center>
+{% endif %}
+<script>
+function myFunction() {
+  var input, filter, table, tr, td, i, txtValue;
+  input = document.getElementById("myInput");
+  filter = input.value.toUpperCase();
+  table = document.getElementById("myTable");
+  tr = table.getElementsByTagName("tr");
+  for (i = 0; i < tr.length; i++) {
+    td = tr[i].getElementsByTagName("td")[0]; /* ADJUST LANG TO WHICH ROW*/
+    if (td) {
+      txtValue = td.textContent || td.innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        tr[i].style.display = "";
+      } else {
+        tr[i].style.display = "none";
+      }
+    }       
+  }
+}
+
+function myFunction2() {
+  var input, filter, table, tr, td, i, txtValue;
+  input = document.getElementById("myInput2");
+  filter = input.value.toUpperCase();
+  table = document.getElementById("myTable");
+  tr = table.getElementsByTagName("tr");
+  for (i = 0; i < tr.length; i++) {
+    td = tr[i].getElementsByTagName("td")[1]; /* ADJUST LANG TO WHICH ROW*/
+    if (td) {
+      txtValue = td.textContent || td.innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        tr[i].style.display = "";
+      } else {
+        tr[i].style.display = "none";
+      }
+    }       
+  }
+}
+
+function myFunction3() {
+  var input, filter, table, tr, td, i, txtValue;
+  input = document.getElementById("myInput3");
+  filter = input.value.toUpperCase();
+  table = document.getElementById("myTable");
+  tr = table.getElementsByTagName("tr");
+  for (i = 0; i < tr.length; i++) {
+    td = tr[i].getElementsByTagName("td")[2]; /* ADJUST LANG TO WHICH ROW*/
+    if (td) {
+      txtValue = td.textContent || td.innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        tr[i].style.display = "";
+      } else {
+        tr[i].style.display = "none";
+      }
+    }       
+  }
+}
+</script>
+{%endblock%}

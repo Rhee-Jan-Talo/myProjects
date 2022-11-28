@@ -1,0 +1,17 @@
+{% extends 'navbar.html' %} 
+{% block content %}
+<div >
+         {% for message in messages %}
+         {% if message %}
+          <script>alert("{{ message }}");</script>
+           {% endif %}
+            {% endfor %}
+    </div>
+<center><h1> Hello Admin </h1></center>
+<br>
+<center><p> ----- ANNOUNCEMENTS ----- </p></center>
+<br>
+
+
+
+{%endblock%}

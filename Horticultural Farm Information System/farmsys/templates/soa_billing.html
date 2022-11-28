@@ -1,0 +1,251 @@
+{% extends 'navbar.html' %} 
+{% block content %}{% load filters %}
+
+<div >
+     {% for message in messages %}
+     {% if message %}
+      <script>alert("{{ message }}");</script>
+       {% endif %}
+        {% endfor %}
+</div>
+<center><h2> Order Billing</h2></center>
+
+
+{% for things in data %}
+<!-- FIRST ROW -->
+<div class="soa_table_container">
+<div class="soa_table_left">
+    <table class="soa_table">
+        <center><p>ACCOUNTS PAYABLE</p></center>
+        <tbody>
+            <td><b>Order Number: </b></td>
+            <td>{{ things.u_order_id }}</td>
+        </tbody>
+        <tbody>
+            <td><b>Product Name: </b></td>
+            <td>{{ things.plant_name }}</td>  
+        </tbody>
+        <tbody>
+            <td><b>Quantity Purchased: </b></td>
+            <td>{{ things.confirmed_quantity }} {{ things.units }}</td>  
+        </tbody>
+        <tbody>
+            <td><b>Product Price per Unit: </b></td>
+            <td>{{ things.confirmed_quantity|price_per_unit:things.total_amount|money_format }}</td>
+        </tbody>
+        <tbody>
+            <td><b>Total Amount: </b></td>
+            <td><u>{{ things.total_amount|money_format }}</u></td>
+        </tbody>
+        <tbody>
+            <td><b>Total Downpayment: </b></td>
+            <td>{{ things.total_downpayment|money_format }}</td>
+        </tbody>
+        <tbody>
+            <td><b>Delivery Fee: </b></td>
+            <td><u>{{ things.delivery_fee|money_format }}</u></td>
+        </tbody>
+    </table>
+    <table class="soa_table">
+        <center><p>BREAKDOWN OF FEES</p></center>
+        <tbody>
+            <td><b>Downpayment Status: </b></td>
+            <td>{{ things.dp_paid|status_format }}</td>
+        </tbody>
+        <tbody>
+            <td><b>Full Payment Status: </b></td>
+            <td>{{ things.fp_paid|status_format }}</td>
+        </tbody>
+        <tbody>
+            <td><b>Subtotal: </b></td>
+            <td>{{ things.total_amount|add:things.delivery_fee|money_format }}</td> 
+        </tbody>
+        {% if payment_method %}
+            {% for i in payment_method %}
+            <tbody>
+                <td><b>Amount Paid: </b></td>
+                <td>{{ i.total_amount_paid|money_format }}</td>   
+            </tbody>
+            <tbody>
+                <td><b>Remaining Balance: </b></td>
+                <td>{{ things.balance_to_pay|money_format  }}</td>
+            </tbody>
+            {% endfor %}
+        {% else %}
+            <tbody>
+                <td><b>Amount Paid: </b></td>
+                <td>N/A</td>
+            </tbody>
+            <tbody>
+                <td><b>Remaining Balance: </b></td>
+                <td>Php. {{ things.balance_to_pay }}</td>        
+            </tbody>
+        {% endif %}
+    </table>
+    <br><br>
+</div>
+<div class="soa_table_right">
+    <table class="soa_table">
+        <center><p>USER INFORMATION</p></center>
+        <tbody>
+            <td><b>Full Name: </b></td>
+            <td>{{ things.full_name }}</td>
+        </tbody>
+        <tbody>
+            <td><b>Contact Number: </b></td>
+            <td>{{ things.phone_num }}</td> 
+        </tbody>
+        <tbody>
+            <td><b>Shipping Address: </b></td>
+            <td>{{ things.shipping_address }}</td>
+        </tbody>   
+    </table>
+</div>
+</div>
+<!-- SECOND ROW -->
+<hr class="solid"/>
+<div class="soa_table_container">
+    <center><h3>Breakdown of payments done</h3></center>
+    {% if payment_method %}
+    <table class="soa_table">
+        <thead>
+            <tr>
+                <th>Payment No.</th>
+                <th>Paid For</th>
+                <th>Payment Method</th>
+                <th>Amount Paid</th>
+                <th>Date</th>
+                <th>Proof</th>
+            </tr>
+        </thead>
+        {% for things2 in payments_done %}
+        <tbody>
+            <td>{{ things2.payment_done_id }}</td>
+            <td>{{ things2.payment_for }}</td>
+            <td>{{ payment_method_selected }}</td>
+            <td>Php. {{ things2.amount_paid }}</td>
+            <td>{{ things2.date_paid|date_format }}</td>
+            <td><a href="{{ things2.proof_receipt }}" download> <u>Link</u></a></td>
+        </tbody>
+        {% endfor %}
+    </table>
+    <br><br>
+    {% else %}
+        <center><p><i style="color: red;">No payments recorded yet</i></p></center><br>
+    {% endif %}
+</div>
+</div>
+    <!-- THIRD ROW -->
+    <hr class="solid"/>
+    <div class="soa_table_container">
+    <div class="soa_table_left">
+    {% if things.is_cancelled == 1 %}
+        <h3>The Order has been cancelled, see below the details of the refund</h3>
+        <table class="soa_table">
+            <tbody>
+                <td><b>Cancel Date: </b></td>
+                <td>{{ things.cancel_date|date_format }}</td>
+            </tbody>
+            <tbody>
+                <td><b>Cancel Reason: </b></td>
+                <td>{{ things.cancel_reason }}</td>
+            </tbody>
+            <tbody>
+                <td><b>Amount of Refund: </b></td>
+                <td>{{ things.cancel_refund_amount|money_format }}</td>
+            </tbody>
+            <tbody>
+                <td><b>Refund Status: </b></td>
+                {% if things.refund_date %}
+                <td>Paid</td>
+                {% for iiii in payment_methods_for_cancel %}
+                </tbody>
+                <tbody>
+                    <td><b>Paid using: </b></td>
+                    <td>{{ iiii.payment_method }}</td>
+                </tbody>
+                
+                <tbody>
+                    <td><b>Receipt: </b></td>
+                    <td>Download your proof of payment<a href="{{ iiii.proof_receipt }}" download> <u> here</u></a></td>
+                </tbody>
+                <tbody>
+                    <td><b>Date of Refund: </b></td>
+                    <td>{{ things.refund_date|date_format }}</td>
+                </tbody>
+                {% endfor %}
+            </table>
+                {% else %}
+                <td>Not yet paid</td>
+                {% endif %}
+                </tbody>
+            </table>
+        {% endif %}
+
+        {% if refund %}
+        <hr>
+        <h3>You requested a Refund for this order, below are its details</h3>
+        {% for jjj in refund %}
+        <table class="soa_table">
+            <tbody>
+                <td><b>Returned Quantity: </b></td>
+                <td>{{ jjj.returned_quantity }} {{ jjj.units }}</td>
+            </tbody>
+            <tbody>
+                <td><b>Refund Status: </b></td>
+                {% if jjj.is_accepted == 1 %}
+                    {% if jjj.refund_status == 1 %}
+                            <td>{{ jjj.refund_status|status_format }}</td>
+                        </tbody>
+                        <tbody>
+                            <td><b>Payment Method: </b></td>
+                            {% for jj in payment_methods_for_refund %}
+                            <td>{{ jj.payment_method }}</td>
+                            {% endfor %}
+                        </tbody>
+                        <tbody>
+                            <td><b>Refund Amount: </b></td>
+                            <td>{{ jjj.refund_amount|money_format }}</td>
+                        </tbody>
+                        <tbody>
+                            <td><b>Receipt: </b></td>
+                            <td>Download your proof of payment<a href="{{ jjj.proof_refund }}" download> <u> here</u></a></td>
+                        </tbody>
+                        <tbody>
+                            <td><b>Date of Refund: </b></td>
+                            <td>{{ jjj.date_of_refund|date_format }}</td>
+                        </tbody>
+                        </table><br>
+                    {% else %}
+                    <td>Not yet paid</td>
+                    </tbody>
+                    {% endif %}
+                {% elif jjj.is_accepted == 3 %}
+                    <td>Declined</td>
+                </tbody>
+                <tbody>
+                    <td><b>Reason for Declining: </b></td>
+                    <td>{{ jjj.reason_decline }}</td>
+                </tbody>
+                {% endif %}
+                    </table>
+                    <br>                
+        {% endfor %}
+        {% endif %}
+
+        {% if redelivery %}
+        <h3>Redelivery</h3>
+        {% for iiiii in redelivery %}
+        <p>For more information, please go to this <a href="{% url 'redelivery_details' iiiii.purchase_history_id %}"><u>link</u></a></p>
+        {% endfor %}
+        {% endif %}
+    </div>
+    </div>
+
+
+
+{% endfor %}
+
+
+
+{%endblock%}

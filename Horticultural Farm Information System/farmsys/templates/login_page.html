@@ -1,0 +1,104 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<title>FarmSystem</title>
+{% load static %}
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
+{% block content %}
+<style>
+p, a{
+
+  text-align: center;
+}
+a: hover, button: hover{
+    cursor: pointer;
+}
+.login_box{
+  width: 350px !important;
+}
+body{
+    transition: background-color .4s ease-in;
+}
+
+
+</style>
+</head>
+<h1 class="company">Farm MIS</h1>
+<h2 class="datsys">Farm Management Information System</h2>
+<div class ="messages">
+    {% for message in messages %}
+        {% if message %}
+            <script>alert("{{ message }}");</script>
+        {% endif %}
+    {% endfor %}
+</div>
+
+<body class="login_body">
+<center><div class="tab" >
+    <x><button class="tablinks" onclick="openCity(event, 'User')" id="user" >Log in as User</button></x>
+    <x class="tab2"><button class="tablinks" onclick="openCity(event, 'Admin')" id="admin" >Log in as Admin</button></x>
+</div></center>
+
+<div id = "User" class=" tabcontent">
+    <div class="login_box">
+      <form class="" method="POST" >{% csrf_token %}
+        <p><input type="text" name="username" placeholder="Username" required /></p>
+        <p><input type="password" name="password" placeholder="Password" required/></p>
+          <div class="outer">
+            <div class="inner"><input type="submit" value="Login"/></div> 
+          </div>
+        <p>--- Or Register using ---</p> 
+        <p><a href="{% url 'register_phone' %}"/><button type="button" style="border:0; width: 60px" class="ff fa fa-android"></button></a>
+        <a href="{% url 'register_email' %}"><button type="button" style="border:0; width: 60px" class="ff fa fa-google"></button></a></p> 
+      </form>
+    </div>
+</div>
+    
+
+<div id="Admin"  class="tabcontent">
+    <div class="login_box_admin">
+    <form class=""  action="{% url 'login_admin' %}" method="POST" >{% csrf_token %}
+        <input type="text" name="username" placeholder="Username" required />
+        <input type="password" name="password" placeholder="Password" required/>
+        <div class="outer">
+            <div class="inner"><input type="submit" value="Login"/></div>
+        </div>
+    </form>
+    </div>
+</div>
+
+<script>
+function openCity(evt, cityName) {
+  var i, tabcontent, tablinks;
+  tabcontent = document.getElementsByClassName("tabcontent");
+  for (i = 0; i < tabcontent.length; i++) {
+    tabcontent[i].style.display = "none";
+  }
+  tablinks = document.getElementsByClassName("tablinks");
+  for (i = 0; i < tablinks.length; i++) {
+    tablinks[i].className = tablinks[i].className.replace(" active", "");
+  }
+  document.getElementById(cityName).style.display = "block";
+  evt.currentTarget.className += " active";
+
+  if(cityName == "User"){
+    document.body.style.backgroundColor = "#5DC68C"; /* #00DC84 #4AF8B2  #00AB67*/ 
+  }
+  else{
+    document.body.style.backgroundColor = "#8ea6e4"; /* darkerblue: #2A3244*/
+  }
+}
+// Get the element with id="defaultOpen" and click on it
+document.getElementById("user").click();
+</script>
+   
+</body>
+{%endblock%}
+</html> 
+
+

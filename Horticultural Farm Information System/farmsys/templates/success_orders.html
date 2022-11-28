@@ -1,0 +1,60 @@
+{% extends 'navbar.html' %} 
+{% block content %}
+{% load filters %}
+<center><h2>Order History</h2></center>
+<center><p>Successful Orders</p></center>
+
+<style>
+input{text-indent: 5px;width: 260px !important;}.right{float: right; margin-right: 45px;}
+</style>
+
+<main class="container-d" >
+{% if data %}
+<a href="{% url 'tabular_form' 'success_orders' %}" class="tabular_button">View in Tabular Form</a>
+
+<div style="" class="cool_form-r right">
+<input type="text" id="myInput" onkeyup="myFunction()" placeholder="Search for plant names, dates..." title="Type in a name"><i class="fa fa-search" aria-hidden="true"></i>
+</div>
+<br><br>
+    <div class="d-flex flex-wrap" id="myTable">
+    	{% for things in data %}
+    	<div class="items">
+	    <a class="click-dis" href="{% url 'success_orders_details' things.f_order_id %}">
+	    <div class="i-container">
+		    <div class="main-title">
+		    	<img src="{{things.batch_img_imgur}}">
+		    	<p class="main-title">{{ things.plant_name }}</p>
+		    </div>
+		    <div class ="sub-details">
+		    	<p>Date Arrived: {{things.date_arrived|date_format }}</p>
+		    </div>     
+	    </div> 
+	    </a>
+	    </div> 
+	    {% endfor %}
+{% else %}
+	<center>--- No Successful Orders Available at the moment ---</center>
+{% endif %}	    
+
+	</div>  
+</main>   
+<script>
+function myFunction() {
+  var input = document.getElementById("myInput");
+  var filter = input.value.toLowerCase();
+  var nodes = document.getElementsByClassName('items');
+  for (i = 0; i < nodes.length; i++) {
+    if (nodes[i].innerText.toLowerCase().includes(filter)) {
+      nodes[i].style.display = "block";
+    } else {
+      nodes[i].style.display = "none";
+    }
+  }
+}
+</script>
+{%endblock%}
+
+
+
+
+

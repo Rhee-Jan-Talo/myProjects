@@ -1,0 +1,44 @@
+{% extends 'navbar.html' %} 
+{% block content %}{% load filters %}
+
+{% if pm_form.errors %}
+	ul>
+	{% for error in pm_form.errors %} 
+	<script>alert("Error missing: {{ error }}");</script>
+	{% endfor %}
+	</ul>
+{% endif %}  
+{% if messages %}
+<div >
+	{% for message in messages %}
+	{% if message %}
+		<script>alert("{{ message }}");</script>
+	{% endif %}
+	{% endfor %}
+</div>
+{% endif %} 
+
+<center><h1>Your Payments</h1></center>
+
+<div class="details-container">
+	{% for things in data %}
+	<div class="details-container-left"> 
+		<center><p>Payment no. {{ things.payment_done_id }}</p></center>
+		<p>Paid for: <b>{{ things.payment_for }}</b></p>
+		<p>Paid using: <b>{{ payment_method }}</b></p>
+	    <p>Amount Paid: <b>{{ things.amount_paid|money_format }}</b></p>
+
+	    <p>Download proof of payment<a href="{{ things.proof_of_payment }}" download> <u> here</u></a></p>
+	    <p>Admin Status: <b>
+	    {% if things.is_confirmed == 1 %}
+	    Confirmed</b></p>
+	    {% else %}
+		Not yet confirmed</b></p>
+	    {% endif %}
+	    
+
+	    <p>Date paid: <b>{{ things.date_paid|date_format }}</b></p>
+	</div>
+	{% endfor %}
+</div>
+{%endblock%}

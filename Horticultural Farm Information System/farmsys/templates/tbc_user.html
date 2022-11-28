@@ -1,0 +1,56 @@
+{% extends 'navbar.html' %} 
+{% block content %}
+{% load filters %}
+
+<style>
+input{text-indent: 5px;width: 260px !important;}.right{float: right; margin-right: 45px;}
+</style>
+<center><h2>Your Orders</h2></center>
+<center><p>To be Confirm by User</p></center>
+
+
+<main class="container-d" >
+{% if data %}
+<a href="{% url 'tabular_form' 'tbc_user' %}" class="tabular_button">View in Tabular Form</a>
+<div style="" class="cool_form-r right">
+<input type="text" id="myInput" onkeyup="myFunction()" placeholder="Search for plant names.." title="Type in a name"><i class="fa fa-search" aria-hidden="true"></i>
+</div><br><br>
+<div class="d-flex flex-wrap" id="myTable">
+	{% for things in data %}
+	<div class="items">
+    <a class="click-dis" href="{% url 'tbc_user_details' things.u_order_id %}">
+    <div class="i-container">
+	    <div class="main-title">
+	    	<img  src="{{ things.batch_img_imgur }}" >
+	    	<p class="main-title">{{ things.plant_name }}</p>
+	    </div>
+	    <div class ="sub-details">
+	    	<p>Total Payables left: <b>{{ things.balance_to_pay|balance_format }}</b></p>
+	    	
+	    </div>     
+    </div> 
+    </a> 
+	</div>
+    {% endfor %}
+    {% else %}
+    <center>--- No orders to be confirmed by User ---</center>
+    {% endif %}
+</div>  
+</main>   
+<script>
+function myFunction() {
+  var input = document.getElementById("myInput");
+  var filter = input.value.toLowerCase();
+  var nodes = document.getElementsByClassName('items');
+  for (i = 0; i < nodes.length; i++) {
+    if (nodes[i].innerText.toLowerCase().includes(filter)) {
+      nodes[i].style.display = "block";
+    } else {
+      nodes[i].style.display = "none";
+    }
+  }
+}
+</script>
+{%endblock%}
+
+

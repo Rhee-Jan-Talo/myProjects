@@ -1,0 +1,38 @@
+{% extends 'navbar.html' %} 
+{% block content %}{% load filters %}
+<div >
+         {% for message in messages %}
+         {% if message %}
+          <script>alert("{{ message }}");</script>
+           {% endif %}
+            {% endfor %}
+    </div>
+<center><h2> All deliveries </h2></center>
+
+<main class="container-d" >
+{% if data %}
+
+    <div class="d-flex flex-wrap">
+        {% for things in data %}
+        <a class="click-dis" href="">
+        <div class="i-container">
+            <div class="main-title">
+                <img src="{{ things.batch_img }}" >
+                <p class="main-title"><b>{{ things.plant_name }}</b></p>
+            </div>
+            <div class ="sub-details">
+                <p>Delivery Status: <b>{{things.delivery_status}}</b></p>
+                
+                <p>Expected Date Arrival: <b>{{things.expected_date_arrival|date_format }}</b></p>
+            </div>     
+        </div> 
+        </a> 
+        {% endfor %}
+{% else %}
+    <center>--- No ongoing Deliveries and Redeliveries Available at the moment ---</center>
+{% endif %}     
+    </div>  
+</main>   
+
+
+{%endblock%}

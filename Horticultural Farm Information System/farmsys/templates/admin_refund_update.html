@@ -1,0 +1,155 @@
+{% extends 'navbar.html' %} 
+{% block content %}{% load filters %}
+
+{% if messages %}
+<div >
+	{% for message in messages %}
+	{% if message %}
+		<script>alert("{{ message }}");</script>
+	{% endif %}
+	{% endfor %}
+</div>
+{% endif %} 
+{% if rf_form.errors %}
+	ul>
+	{% for error in rf_form.errors %} 
+	<script>alert("Error missing: {{ error }}");</script>
+	{% endfor %}
+	</ul>
+{% endif %} 
+<style>
+	label{
+		font-size: 17px;
+		font-weight: bold;
+	}
+	.button_admin{
+		background-color: #378DFC;
+		font-weight: bold;
+		padding: 7px 8px 7px 8px;
+		
+	}
+
+	center{
+		font-size: 17px;
+	}
+	.p_methods{
+		padding: 10px 20px 10px 20px ;
+		font-size: 15px;
+		margin-right: 10px;
+	}
+	.refund_stuff p{
+		font-size: 17px;
+	}
+
+</style>
+<center><h2>Refund Details</h2></center>
+
+{% for things in data %}
+
+<div class="admin-container">
+	<div class="cool_form">
+		<div class="admin_left">	
+				
+			<center>ORDER DETAILS</center><br>	
+			<p><label>Order ID:</label><input type="search"value="{{things.u_order_id}}"name="transac_id"readonly></input></p>
+			<p><label>Plant Name:</label><input type="search" value="{{things.plant_name}}" readonly></input></p>
+			<p><label>Quantity Delivered:</label><input type="search" value='{{things.quantity |stringformat:".0f"}} {{things.units}}' readonly></input></p>
+			<p><label>Received Quantity:</label><input type="search" name='quantity_received' value="{{ things.quantity_received}} {{things.units}}" readonly></input></p>
+			<p><label>Returned Quantity:</label><input type="search" name='refund_quan' value="{{ things.returned_quantity }} {{things.units}}" readonly></input></p>
+			
+			<p><label>Reason for Refund:</label>    
+			<input type="search" name='reason_refund' value="{{ things.reason_for_refund }}" readonly></input></p>  
+			<p><label>See your user's proof <a href="{{ things.proof_refund }}" download> <u> <i>here</i></u></a></label></p>
+			<p><label>Request Date: </label><input type="search" value="{{things.request_date|date_format }}" readonly/></p>
+			<br><br>	
+
+			<hr>
+			<br><center>USER DETAILS</center><br>
+			<p><label>User Full Name:</label>
+			<input type="search" value = "{{ things.full_name }}" name="u_order_id" readonly /></input></p>
+
+			<p><label>Email:</label>
+			<input type="search" value = "{{ things.email_ad }}" name="harvest_id" readonly /></input></p>
+
+			<p><label>Contact Number:</label>
+			<input type="search" value = "{{ things.phone_num }}" name="plant_name" readonly /></input></p>
+			<br><br>
+							
+		</div>					
+	</div>		
+		<div class="admin_right_nomargin">
+			<form class="cool_form" method="POST">{% csrf_token %}
+				<center>REFUND DETAILS</center><br>
+				<p><label>Review the entire order details <a href="{% url 'view_only_order_details' things.u_order_id %}" ><u><i>here</i></u></a></label></p>
+		    	<div class="refund_stuff">
+		    		<p>Refund Formula: <b>(Units Returned ÷ Units Sold) x 60</b></p>
+			    	<p>Total Product Price: <b>{{ things.total_amount|money_format }}</b></p>
+			    	<p>Quantity Returned: <b>{{ things.returned_quantity }} {{ things.units }}</b></p>
+			    	<p>Refund Percentage: <b>{{ things.returned_quantity|calc_refund_p:things.quantity }}</b></p>
+			    	<p>Refund Amount: <b><u>{% calc_rf things.total_amount things.returned_quantity things.quantity %}</u></b></p>
+		    	</div>
+				<!--<p><label>Date of refund:</label><input type="date" required></input></p>
+				<p><label>Refund Amount:</label><input type="number" required></input></p>
+				<p><label>Refund Status:</label><input type="search" required></input></p>
+				-->
+				{% if things.reason_decline %}
+				
+				<hr>
+				<p style="color: red;"><label>This Refund is declined</label></p>
+				<p style="font-size: 20px;">Reason: <b><u>{{ things.reason_decline }}</u></b></p>
+				{% else %}
+				{% if payment_methods %}
+					{% if is_selected %}
+						{% for i in payment_methods %}
+							{% if i.is_selected == 1 %}
+							<hr>
+							<p style="font-size: 16px;"><i>You paid this Refund using <b> <u>{{ i.payment_method }}</u></b> Click this<b><a href="{{ things.proof_refund }}" download> <u>Link</u> </a></b>to see your receipt</i></p>
+							<p style="font-size: 16px;">Refund amount paid: <b><u>{{things.refund_amount|money_format}}</u></b></p>
+							<p style="font-size: 16px;">Date paid: <b><u>{{things.date_of_refund|date_format }}</u></b></p>
+							{% endif %}
+						{% endfor %}
+
+
+					{% else %}
+					<hr>
+					<p><label>Available Payment Methods inputted by User:</label></p>
+					<p style="font-size: 16px;"><i>Click the buttons below to send payment</i></p>
+						{% for k in payment_methods %}
+							<a class="button_admin p_methods" href="{% url 'refund_payment' k.pmfr_id %}">{{ k.payment_method }}</a>
+						{% endfor %}
+
+					{% endif %}
+				{% else %}
+					<p style="font-size: 16px; color:red"><i>No payment methods available please wait for user to input this field</i></p>
+				{% endif %}
+
+				
+				
+				{% endif %}
+				
+			</form>
+		</div>
+</div>
+<script>
+	function verifypayment(){
+		let amount = document.querySelector("input[type='number'][name=amount_paid]").value;
+		let dp = document.querySelector("input[type='aa'][name=dp]").value;
+		let pic = document.querySelector("input[type='file'][name=proof_receipt]").value;
+		console.log(pic)
+		console.log(dp)
+		console.log(amount)
+		if(!pic){
+			alert("Please upload your Proof of Receipt")
+		}
+		else if(parseFloat(dp) > parseFloat(amount)){
+			alert("Your payment must be equal to or greater than the required downpayment (Php. " +dp + " )")
+		}
+		else{
+			document.getElementById("submit").removeAttribute("hidden")
+			document.getElementById("verify").setAttribute("hidden", true)
+		}
+	}
+
+</script>
+{% endfor %}
+{%endblock%}

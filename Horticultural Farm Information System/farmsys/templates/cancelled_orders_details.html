@@ -1,0 +1,139 @@
+{% extends 'navbar.html' %} 
+{% block content %}{% load filters %}
+
+<div >
+	{% for message in messages %}
+		{% if message %}
+		<script>alert("{{ message }}");</script>
+		{% endif %}
+	{% endfor %}
+</div>
+<center><h1>Cancelled Orders</h1></center>
+<main>
+	{% for things in data %}
+	<div class="details-container">
+		<div class="details-container-left" > 
+			<br>			
+			<p>Order ID: <b>{{ things.u_order_id }}</b></p>
+		    <p>Plant Name: <b>{{ things.plant_name }}</b></p>
+		    <p>Quantity: <b>{{ things.confirmed_quantity }} {{ things.units }}</b></p>
+		   	<p>Price per unit: <b>Php. {{ things.confirmed_quantity|price_per_unit:things.total_amount|money_format }}</b></p>
+		   	<p>Product Total Price: <b>{{ things.total_amount|money_format }}</b></p>
+		   	<p>Delivery fee: <b>{{ things.delivery_fee|money_format }}</b></p>
+		    <p>Total Amount: <b> {{ things.delivery_fee|add:things.total_amount|money_format }}</b></p>
+		    <p>Expected Delivery arrival: <b>{{ things.expected_date_arrival|date_format }}</b></p>
+			<p>Requested Delivery arrival : <b>{{ things.date_needed|date_format }}</b></p>
+			
+			<hr>
+		    <center><b>Delivery Information</b></center>
+		    {% if delivery_info %}
+		    <p>Click <a href="{% url 'delivery_info' things.f_order_id %}"><u>here </u></a>to see delivery information </p>
+		    {% else %}
+		    <p><i style="color: red;">No Delivery Info Data available for this order</i></p>
+		    {% endif %}
+		    
+
+			<hr>
+		    <center><b>Payment Informations</b></center>
+		    {% if payment_methods %}
+		    	{% for i in payment_methods %}
+			    	<p>You Paid using: <b>{{i.payment_method}}</b></p>	
+					<p>Total amount paid: <b>{{i.total_amount_paid|money_format }}</b></p>				
+					<p>Total Amount Payable left: <b> {{ things.balance_to_pay|money_format }}</b></p>
+					{% if things.dp_paid|to_float == 1 %}
+					<p>Down Payment Status: <b>PAID</b></p>	
+					{% else %}
+					<p>Down Payment Status: <b>NOT ENOUGH PAYMENT</b></p>	
+					{% endif %}
+
+					{% if things.fp_paid|to_float == 1 %}
+					<p>Full Payment Status: <b>PAID</b></p>	
+					{% else %}
+					<p>Full Payment Status: <b>NOT ENOUGH PAYMENT</b></p>	
+					{% endif %}
+			    {% endfor %}
+		    {% else %}
+		    <p><i style="color: red;">No Payment Information Data available for this order</i></p>
+		    {% endif %}
+		    
+
+		    <hr>
+		    <center><b>Payments Done</b></center>
+		    {% if payment_done %}
+		    	{% for ii in payment_methods %}
+		    		<p><a href="{% url 'view_payment_done' ii.p_id %}" class="tabular_button-notopmargin">Click here to View your Payment details</a></p>
+		    	{% endfor %}
+		    {% else %}
+		    <p><i style="color: red;">No recorded Payment for this order</i></p>
+		    {% endif %}
+			
+
+		</div>     
+		<div class="details-container-right">
+			<p><img class="img-container" src="{{ things.batch_img_imgur }}"></p>
+			<p>Reason for cancellation: <b>{{ things.cancel_reason }}</b><br><br>
+			
+		    Date Cancelled: <b>{{ things.cancel_date|date_format }}</b><br><br>
+		    Refund Amount: <b>{{things.cancel_refund_amount|money_format}}</b>
+			</p>
+			<hr>
+		    <div>
+		    	{% if things.cancel_refund_amount == "0" or things.cancel_refund_amount == "0.0" %}
+		    	<center><p><i style="color: red;">No refund for this Order</i></p></center>
+		    	{% else %}
+		    	<center><p><b>Payment Methods for Refund</b> <br><i>Admin will send the refund amount in the given payment methods, please dont forget to input this </i></p></center>
+		    	{% for ii in payment_methods_for_refund %}
+					<div style="text-align: left; ">
+						{% if ii.is_selected == 1 %}
+						<p>Refund Status: <b>PAID</b><br><br>
+						Click <a href="{{ ii.proof_receipt }}" download><u>here</u></a> to view proof of payment by Admin</p>
+						
+						{% endif %}
+					</div>
+				{% endfor %}
+		    	{% if payment_methods_for_refund %}		
+		    	    {% if things.refund_date %}   
+		    	    {% else %} 	
+					<div class="table-items-smol">
+						<table class="table-striped">
+							<thead>
+								<tr>
+									<th>Payment Method</th>
+									<th>Account Name</th>
+									<th>Acccount Number</th>
+								</tr>
+							</thead>
+							{% for i in payment_methods_for_refund %}
+							<tbody>
+								<tr>
+									<td>{{i.payment_method}}</td>
+									<td>{{i.account_name}}</td>
+									<td>{{i.account_number}}</td>
+								</tr>
+							</tbody>
+						{% endfor %}
+						</table>
+					</div>	
+					<p><a href="{% url 'pm_refund_order' things.f_order_id %}" class="tabular_button">Add Payment Method</a></p>
+					{% endif %}
+					    		
+		    	
+
+		    	{% else %}
+		    	
+			    <div>
+			    	<p><i style="color: red">No recorded Payment method for this refund yet</i></p>
+			    	<p><a href="{% url 'pm_refund_order' things.f_order_id %}" class="tabular_button">Add Payment Method</a></p>
+			    </div>
+			    {% endif %}
+			{% endif %}
+		    </div>
+		    </div>
+		</div>
+	</div>
+	{% endfor %}
+</main>
+
+
+
+{%endblock%}

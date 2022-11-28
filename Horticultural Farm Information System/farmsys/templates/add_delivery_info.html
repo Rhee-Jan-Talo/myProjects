@@ -1,0 +1,152 @@
+{% extends 'navbar.html' %} 
+{% block content %}{% load filters %}
+{% if rf_form.errors %}
+	ul>
+	{% for error in rf_form.errors %} 
+	<script>alert("Error missing: {{ error }}");</script>
+	{% endfor %}
+	</ul>
+{% endif %}  
+{% if messages %}
+<div >
+	{% for message in messages %}
+	{% if message %}
+		<script>alert("{{ message }}");</script>
+	{% endif %}
+	{% endfor %}
+</div>
+{% endif %} 
+<style>
+	label{
+		font-size: 17px;
+		font-weight: bold;
+	}
+	.button_admin{
+		background-color: #378DFC;
+		font-weight: bold;
+		padding: 7px 8px 7px 8px;
+		
+	}
+	input[type="date"]{
+		width: 40.6% !important;
+	}
+	center{
+		font-size: 17px;
+	}
+	.admin_left{
+		margin-left: 50px;
+	}
+	.mini_button {
+	  margin-top: 15px;
+	  
+	  float: right;
+	  padding: 6px 0px 6px 0px;
+	  width: 44%;
+	  border: 2px solid grey;
+	  color: black;
+	  border-radius: 7px;
+	  transition: 0.25s;
+	  cursor: pointer;
+	  font-family: "Source Sans Pro", sans-serif;
+	  font-size:  16px;
+	  background: #378DFC; 
+	  margin-bottom: 70px;
+	}
+	.mini_button:hover {
+	  color: white;
+	  font-weight: bold;
+	  background: #D9E3F1;
+	}
+	.submit_button {
+	  margin-top: 15px;
+	  
+	  padding: 6px 0px 6px 0px;
+	  width: 100%;
+	  border: 2px solid grey;
+	  color: black;
+	  border-radius: 7px;
+	  transition: 0.25s;
+	  cursor: pointer;
+	  font-family: "Source Sans Pro", sans-serif;
+	  font-size:  16px;
+	  background: #378DFC; 
+	  margin-bottom: 70px;
+	}
+	.submit_button:hover {
+	  color: black;
+	  font-weight: bold;
+	  background: #D9E3F1;
+	}
+</style>
+<br>
+
+<center>ADD DELIVERY_INFO</center>
+
+<div class="admin-container">
+<div class="admin_left">
+<form class="cool_form" method="POST">{% csrf_token %}
+	{% for things in data %}
+	<input type=search name="f_order_id" value="{{ f_order_id }} "hidden/>
+	<center><label>Order Information</label></center>
+	<p><label>Order ID:</label>
+	<input type=search value="{{ things.u_order_id }}" readonly/></p>
+
+	<p><label>Delivery Status</label>
+	<input type="search" name="delivery_status" readonly/></p>
+
+	
+	<input type="search" name ="details" hidden/>
+	<p><label >Date: </label><input type="date" name="d_date" required /></p>
+	<p><label >Task: </label><input type="search" name="d_details" id="t_task" required/></p>
+
+
+	<p><label>Date Arrived</label>
+	<input type=search name="date_arrived" value="N/A" readonly/></p>
+	<br><hr>
+	<center><label>Customer Information</label></center>
+	<p><label>Customer Name: </label>
+	<input type=search name="shipping_address" value="{{ customer_name }}" readonly/></p>
+
+	<p><label>Contact Number: </label>
+	<input type=search name="shipping_address" value="{{ contact_info }}" readonly/></p>
+
+	<p><label>Shipping Address</label>
+	<input type=search name="shipping_address" value="{{ shipping_address }}" readonly/></p>
+
+	
+
+	{% endfor %}
+	<button type="button" style="background: #378DFC; margin-bottom: 70px;" class="mini_button" id="edit_button" onclick="getDetails()" >Confirm Submission</button>
+	<button class="submit_button" id="save_button" type='submit'  hidden>Submit</button>
+</form>
+</div>
+
+</div>
+
+<script>
+	function getDetails(){
+
+		let date = document.querySelector("input[type='date'][name=d_date]").value;
+		let task = document.querySelector("input[type='search'][name=d_details]").value
+		let details = document.querySelector("input[type='search'][name=details]").value
+		let d_status = document.querySelector("input[type='search'][name=delivery_status]").value;
+		date = date.split("-")
+		date = date[1]+"/"+date[2]+"/"+date[0] 
+
+		details = date + " - " + task +" ;";
+		
+		if(date == "" || task == ""){
+			alert("Kindly Input Date and Task in order to save this form")
+		}
+		else{
+			document.getElementById('edit_button').setAttribute('hidden', true);
+			document.getElementById('save_button').removeAttribute("hidden");
+			document.getElementById('t_task').removeAttribute("required");
+			document.getElementById('t_task').setAttribute('readonly', true);
+			document.querySelector("input[type='search'][name=details]").value = details;
+			document.querySelector("input[type='search'][name=delivery_status]").value = task;
+		}
+	}
+</script>
+
+{%endblock%}

@@ -1,0 +1,214 @@
+{% extends 'navbar.html' %} 
+{% block content %}{% load filters %}
+
+
+{% if messages %}
+<div >
+	{% for message in messages %}
+	{% if message %}
+		<script>alert("{{ message }}");</script>
+	{% endif %}
+	{% endfor %}
+</div>
+{% endif %} 
+<center><h2>ALL REFUND REQUESTS</h2></center>
+{% if data %}
+<a id="remove_view" onclick="removeToView()" class="button_admin">Remove Items to View</a>
+<a id="back_to_view" onclick="backToView()" class="button_admin" hidden>Back to View</a>
+<a id="view_all" href="{% url 'removed_from_view' 'refund' %}" class="button_admin">View All Removed Items</a><br><br>
+
+
+<form method="POST">{% csrf_token %}
+<div class="search-container">
+	<input type="number" id="myInput3" onkeyup="myFunction3()" placeholder="Search for Order Id.." title="Type in a name">
+	<input type="text" id="myInput" onkeyup="myFunction()" placeholder="Search for names.." title="Type in a name">
+	<input type="text" id="myInput2" onkeyup="myFunction2()" placeholder="Search for Products.." title="Type in a name">
+	<i class="fa fa-search" aria-hidden="true"></i>
+	<div class="right-container">
+	<label>Group by:</label>	
+	<button class="button_admin" type="submit" name="submit" value="refund_amount">Refund Status</button>
+	<button class="button_admin" type="submit" name="submit" value="is_accepted">Admin Status</button>
+	<button class="button_admin" type="submit" name="submit" value="request_date">Date</button>
+	<button class="button_admin" type="submit" name="submit" value="u_order_id">Order ID</button>
+	<button class="button_admin" type="submit" name="submit" value="plant_name">Product</button>
+	<button class="button_admin" type="submit" name="submit" value="full_name">Name</button>
+	<i class="fa fa-filter" aria-hidden="true"></i>
+  </div>
+</div>
+<form><br><br>
+<div class="admin-table">
+	<table class="table-striped" id="myTable">
+		
+		<thead>
+			<tr>
+					<th>User Full Name</th>
+			    <th>Order ID</th>
+			    <th>Plant Name</th>
+			    <th>Date Requested</th>
+
+
+			    <th>Admin Status</th>
+			    
+			    <th>Refund Status</th>
+			    
+			    <th>Admin Action</th>
+			</tr>
+		</thead>
+		{% for things in data %}
+		<tbody>
+			<tr>
+			    <td>{{ things.full_name }}</td>
+			    <td>{{ things.u_order_id }}</td>
+			    <td>{{ things.plant_name }}</td>
+			    <td>{{ things.request_date|date_format }}</td>
+
+
+			    {% if things.is_accepted == 1 %}
+			    	{% if things.refund_amount %}
+			    		<td style="color:green">Accepted</td> 
+					    <td style="color:green">Paid</td>
+					    <td>
+					    	<admin>
+					    	<a href="{% url 'admin_refund_update' things.refund_id %}" class="button_admin">Show</a>
+					    	</admin>
+					    	<remove hidden>
+					    	<a id="remove" onclick="return confirm('This Row will be removed from view you sure you want to continue?');" href="{% url 'remove_to_view' 'refund' things.refund_id %}" class="button_admin" >&#x2718</a>
+					    	</remove>
+					    </td>
+			    	{% else %}
+			    		<td style="color:green">Accepted</td>
+					    <td style="color:red">No Payment</td>
+					    <td>
+					    	<admin>
+					    	<a href="{% url 'admin_refund_update' things.refund_id %}" class="button_admin">Update</a>
+					    	</admin>
+					    	<remove hidden>
+			    			<a id="remove" onclick="return confirm('This Row will be removed from view you sure you want to continue?');" href="{% url 'remove_to_view' 'refund' things.refund_id %}" class="button_admin" >&#x2718</a>
+			    			</remove>
+					    </td>
+			    	{% endif %}
+			    {% elif things.is_accepted == 3%}
+			    <td style="color:red">Declined</td>
+			    <td>N/A</td>
+			    <td>
+			    	<admin>
+			    	<a href="{% url 'admin_refund_update' things.refund_id %}" class="button_admin">See details</a>
+			    	</admin>
+			    	<remove hidden>
+	    			<a id="remove" onclick="return confirm('This Row will be removed from view you sure you want to continue?');" href="{% url 'remove_to_view' 'refund' things.refund_id %}" class="button_admin" >&#x2718</a>
+	    			</remove>
+			    </td>
+			    {% else %}
+			    <td  style="color:red">No Response</td>
+			    <td>N/A</td>
+			    <td>
+			    	<admin>
+			    	<a href="{% url 'admin_refund_action' things.refund_id %}" class="button_admin">Action</a>
+			    	</admin>
+			    	<remove hidden>
+	    			<a id="remove" onclick="return confirm('This Row will be removed from view you sure you want to continue?');" href="{% url 'remove_to_view' 'refund' things.refund_id %}" class="button_admin" >&#x2718</a>
+	    			</remove>
+			    </td>
+			    {%endif %}
+			</tr>
+		</tbody>
+		{% endfor %}
+	</table>
+</div>
+{% else %}
+<center>--- No Refund Requests Available at the moment ---</center><br><br>
+<center><a id="view_all" href="{% url 'removed_from_view' 'refund' %}" class="button_admin">View All Removed Items</a></center>
+{% endif %}
+<script>
+function myFunction() {
+  var input, filter, table, tr, td, i, txtValue;
+  input = document.getElementById("myInput");
+  filter = input.value.toUpperCase();
+  table = document.getElementById("myTable");
+  tr = table.getElementsByTagName("tr");
+  for (i = 0; i < tr.length; i++) {
+    td = tr[i].getElementsByTagName("td")[0]; /* ADJUST LANG TO WHICH ROW*/
+    if (td) {
+      txtValue = td.textContent || td.innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        tr[i].style.display = "";
+      } else {
+        tr[i].style.display = "none";
+      }
+    }       
+  }
+}
+
+function myFunction2() {
+  var input, filter, table, tr, td, i, txtValue;
+  input = document.getElementById("myInput2");
+  filter = input.value.toUpperCase();
+  table = document.getElementById("myTable");
+  tr = table.getElementsByTagName("tr");
+  for (i = 0; i < tr.length; i++) {
+    td = tr[i].getElementsByTagName("td")[2]; /* ADJUST LANG TO WHICH ROW*/
+    if (td) {
+      txtValue = td.textContent || td.innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        tr[i].style.display = "";
+      } else {
+        tr[i].style.display = "none";
+      }
+    }       
+  }
+}
+function myFunction3() {
+  var input, filter, table, tr, td, i, txtValue;
+  input = document.getElementById("myInput3");
+  filter = input.value.toUpperCase();
+  table = document.getElementById("myTable");
+  tr = table.getElementsByTagName("tr");
+  for (i = 0; i < tr.length; i++) {
+    td = tr[i].getElementsByTagName("td")[1]; /* ADJUST LANG TO WHICH ROW*/
+    if (td) {
+      txtValue = td.textContent || td.innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        tr[i].style.display = "";
+      } else {
+        tr[i].style.display = "none";
+      }
+    }       
+  }
+}
+function removeToView(){
+	
+	const admin = document.getElementsByTagName("admin")
+	const remove = document.getElementsByTagName("remove")
+	const button = document.getElementById("remove_view") 
+	const button2 = document.getElementById("back_to_view")
+	const view_all = document.getElementById("view_all")
+	for(i=0; i<admin.length; i++){
+		admin[i].setAttribute('hidden', true)
+	}
+	for(j=0; j<remove.length; j++){
+		remove[j].removeAttribute("hidden");
+	}
+
+	button.setAttribute('hidden', true);
+	button2.removeAttribute("hidden");
+	view_all.setAttribute('hidden', true);
+}
+function backToView(){
+	
+	const admin = document.getElementsByTagName("admin")
+	const remove = document.getElementsByTagName("remove")
+	const button = document.getElementById("remove_view") 
+	const button2 = document.getElementById("back_to_view")
+	const view_all = document.getElementById("view_all")
+	for(i=0; i<remove.length; i++){
+		remove[i].setAttribute('hidden', true)
+	}
+	for(j=0; j<admin.length; j++){
+		admin[j].removeAttribute("hidden");
+	}
+	button2.setAttribute('hidden', true);
+	button.removeAttribute("hidden");
+	view_all.removeAttribute("hidden");
+}
+</script>
+{%endblock%}

@@ -1,0 +1,46 @@
+{% extends 'navbar.html' %} 
+{% block content %} {% load filters %}
+<style>
+	.left{
+		float: left;
+		margin-left: 75px;
+		
+		width: 135px;
+	}
+	.right{
+		float: right;
+		margin-right: 75px;
+
+		width: 135px;
+	}
+
+	.middle {
+	  display: flex;
+	  justify-content: center;
+	  align-items: center;
+
+	}
+
+</style>
+<center><h1>Growth Details as of {{ date|month_yr_format }}</h1></center>
+
+
+
+<form class="cool_form right" action="{% url 'next_month' date batch_id %}" method="POST">{% csrf_token %}
+	<p><input type="submit" value="Next Month"/></p>
+</form>
+
+<form class="cool_form left" action="{% url 'prev_month' date batch_id %}" method="POST">{% csrf_token %}
+	<p><p><input type="submit" value="Previous Month"/></p>
+</form>
+
+<form class="cool_form middle" action="{% url 'growth_details' batch_id %}" method="POST">{% csrf_token %}
+	<p><p><input style="padding: 10px 15px 10px 15px;" type="submit" value="Back to First Month of Activity"/></p>
+</form>
+
+
+
+{{ calendar }}
+
+
+{% endblock %}

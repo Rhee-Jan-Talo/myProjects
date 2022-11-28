@@ -1,0 +1,42 @@
+{% extends 'navbar.html' %} 
+{% block content %}
+{% if messages %}
+<div >
+	{% for message in messages %}
+	{% if message %}
+		<script>alert("{{ message }}");</script>
+	{% endif %}
+	{% endfor %}
+</div>
+{% endif %}  
+<center><h3>Payment Option</h3></center>
+<center>Refund</center>
+<main>
+	<form class="cool_form-r" method="POST" enctype="multipart/form-data"> {% csrf_token %}
+	<div class="details-container">
+		<div class="details-container-left"> 
+			<br>
+			<p>The admin will send the refund amount to this account after confirming the requested refund</p>
+			
+
+			{% if purchase_history_id %}
+			<p>Transaction ID: <input type="text" style="font-weight: bold;" value="{{purchase_history_id}}" name="purchase_history_id" readonly></input></p>
+			{% else %}
+			<input value="{{f_order_id}}" name="purchase_history_id" hidden></input>
+			{% endif %}
+		    <p>Payment Method:  <input type="text" name="payment_method"></input></p>
+
+		    <p>Payment For:  <input type="text" style="font-weight: bold;" value="REFUND" name="payment_for" readonly></input></p>
+		    
+
+		   
+				<p>Account Number: <input type="text" name="account_num" required></input></p>
+				<p>Account Name:  <input type="text" name="account_name" required></input></p>
+				<input class="tabular_button-notopmargin" type="submit">
+			
+		    
+		</div>     
+	</div>
+	</form>
+</main>
+{% endblock %}

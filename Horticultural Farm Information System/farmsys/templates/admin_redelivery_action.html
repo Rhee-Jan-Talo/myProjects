@@ -1,0 +1,95 @@
+{% extends 'navbar.html' %} 
+{% block content %}{% load filters %}
+
+
+{% if form.errors %}
+	ul>
+	{% for error in form.errors %} 
+	<script>alert("Error missing: {{ error }}");</script>
+	{% endfor %}
+	</ul>
+{% endif %}  
+{% if messages %}
+<div >
+	{% for message in messages %}
+	{% if message %}
+		<script>alert("{{ message }}");</script>
+	{% endif %}
+	{% endfor %}
+</div>
+{% endif %} 
+<style>
+	label{
+		font-size: 17px;
+		font-weight: bold;
+	}
+	.button_admin{
+		background-color: #378DFC;
+		font-weight: bold;
+		padding: 7px 8px 7px 8px;
+		
+	}
+
+	center{
+		font-size: 17px;
+	}
+
+</style>
+<center><h2>Redelivery Action</h2></center>
+
+<div class="admin-container">
+	<div class="admin_left">
+		<form class="cool_form" method="POST" >{% csrf_token %}
+			{% for things in data %}
+			
+			<p><label>Order ID:</label><input type="search"value="{{things.u_order_id}}"name="transac_id"readonly></input></p>
+			
+
+
+			<p><label>Plant Name:</label><input type="search" value="{{things.plant_name}}" readonly></input></p>
+
+			<p><label>Grade:</label><input type="search"value="{{ things.grade }}" readonly></input></p>
+
+			<p><label>Quantity Delivered:</label><input type="search" value='{{things.quantity |stringformat:".0f"}}' readonly></input></p>
+			<p><label>Received Quantity:</label><input type="search" name='quantity_received' value="{{ things.quantity_received}}" readonly></input></p>
+			<p><label>Returned Quantity:</label><input type="search" name='refund_quan' value="{{ things.returned_quantity }}" readonly></input></p>
+			<p><label>Units:</label><input type="search" value="{{things.units}}" name="units" readonly></input></p>
+			<p><label>Quantity Remaining for this grade:</label><input type="search" value="{{ things.quantity_harvested|quan_format }} {{ things.units }}" readonly></input></p>
+
+			
+			<p><label>Reason for Redelivery:</label>    
+			<input type="search" name='reason_refund' value="{{ things.reason_for_redelivery }}" readonly></input></p>  
+
+
+			<p><label>See User's submitted proof <a href="{{ things.proof_img }}" download> <u> <i>here</i></u></a></label></p>
+			<p><label>Request Date: </label><input type="search" value="{{things.request_date|date_format }}" readonly/></p>
+			
+			<p><label>Review entire order details before accepting <a href="{% url 'view_only_order_details' things.u_order_id %}" ><u><i>here</i></u></a></label></p>
+			<input type="submit" style="background: #378DFC; margin-bottom: 70px;"value="Accept Request"></input>
+
+			<br><hr>
+			<br><center>USER DETAILS</center><br>
+			<p><label>User Full Name:</label>
+			<input type="search" value = "{{ things.full_name }}" name="u_order_id" readonly /></input></p>
+
+			<p><label>Email:</label>
+			<input type="search" value = "{{ things.email_ad }}" name="harvest_id" readonly /></input></p>
+
+			<p><label>Contact Number:</label>
+			<input type="search" value = "{{ things.phone_num }}" name="plant_name" readonly /></input></p>
+			<br><br>
+			
+		</form>
+	</div>
+	<div class="admin_right">
+		<form class="cool_form" action="{% url 'decline_redelivery' things.re_delivery_id %}" method="POST" >{% csrf_token %}
+			<p><label>Decline Reason: </label><input type="search" name="decline_reason" required/></p>
+			<input type="submit" style="background: #378DFC; margin-bottom: 70px;"value="Decline Request"></input>
+			{% endfor %}
+		</div>
+		</form>
+	</div>
+</div>
+
+
+{%endblock%}

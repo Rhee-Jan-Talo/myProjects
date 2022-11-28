@@ -1,0 +1,77 @@
+import messages
+from datetime import datetime
+
+message = ""
+message = messages.getmessage()
+messageTemp = str(message[0])
+messageAirp = str(message[3])
+messageWL = str(message[1])
+messageHum = str(message[4])
+messageWS = str(message[2])
+date = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
+
+
+
+print("Content-Type: text/html\n")
+b = f" Temp: {messageTemp}  \n AirP: {messageAirp} \n WL: {messageWL} \n HUM: {messageHum} \n WS: {messageWS}"
+a=   """
+       <head>
+       <title>
+        Weather Station IOT by Rhee Pogi
+       </title>
+       </head>
+       <meta http-equiv="refresh" content=".1">
+       <style>
+       ul {white-space: nowrap;}
+       ul, li {list-style: none;display: inline; margin-bottom: 100px; margin-top: 90px;}
+       
+       </style>
+       <body>
+       <center>
+       <div>
+       <center>
+              <ul>
+                  <p>
+
+                         <li><img src="temp.png" alt="loading please wait...">asdasda</li>
+                         <li><img src="humidity.png" alt="loading please wait..."></li>
+                  </p>
+                  <p>
+                         <li><img src="waterlevel.png" alt="loading please wait..."></li>
+                         <li><img src="windspeed.png" alt="loading please wait..."></li>
+                         <li><img src="airpressure.png" alt="loading please wait..."></li>
+                  </p>
+              </ul>
+       </center>
+       </div>
+       </center>
+       <br></br><br></br>
+       </body>
+       """
+print(b+ a)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+'''
+<script>
+function autoRefresh() {
+       window.location = window.location.href;
+       }
+       setInterval('autoRefresh()', 1000);
+</script>
+'''

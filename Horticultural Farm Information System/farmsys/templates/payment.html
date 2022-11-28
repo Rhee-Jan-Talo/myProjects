@@ -1,0 +1,86 @@
+{% extends 'navbar.html' %} 
+{% block content %} {% load filters %}
+
+<main>
+	<div class="details-container">
+		<div class="details-container-left"> 
+			{% if form.errors %}
+			  <ul>
+			    {% for error in form.errors %} 
+			      <script>alert("{{ error }}");</script>
+			    {% endfor %}
+			  </ul>
+			{% endif %}  
+			<br>
+			{% for things in data %}
+			
+			<form class="cool_form-r" method="POST"  enctype="multipart/form-data"> {% csrf_token %}	
+			<p>Order ID: <b>{{ things.u_order_id }}</b></p>
+		    <p>Selected Payment Method: <b>{{ pmethod }}</b></p> 
+		    <p>Down Payment Amount: <b>{{ dp|money_format }}</b></p> 
+		    <p>Full Payment Amount: <b>{{ fp|money_format }}</b></p>
+		    <p>Total Payables Left: <b><u>{{  things.balance_to_pay|money_format  }}</u></b></p>
+		    <div class="container"><label>Payment For: </label>
+			  <div class="radio">
+			    <input id="one" name="payment_for" type="radio" value= "Full Payment" required>
+			    <label for="one" class="radio-label">Full Payment</label>
+			  </div>
+			  <div class="radio">
+			    <input id="two" name="payment_for" type="radio" value= "Down Payment">
+			    <label for="two" class="radio-label">Down Payment</label>
+			  </div>
+			</div>	
+
+			<input type="search" name="p_id" value = "{{things.p_id}}" hidden/>
+
+		    <p>Kindly send the payment to this Account:</p>
+		    <div class="details-container-left"> 
+				
+				<p>Phone Number: <b>{{ things.account_number }}</b></p>
+				<p>Account Name: <b>{{ things.account_name }}</b></p>
+				<p>Upload Proof of receipt here: </p>
+
+					<label for="file-upload" class="custom-file-upload">
+						 <i class="fa fa-image"></i>
+					</label>
+					<input id="file-upload" name="proof_receipt" type="file" accept="image/*" />
+				<br><br>
+				<p>Amount Paid: <input type="number" step="any" name="amount_paid" id="amount_paid" required/></p>
+				<p><input type="aa" name="dp" value="{{dp}}" hidden/></p>
+
+
+				<p>Status: <b>Pending</b></p>
+				<div class="submit">
+					<button type="button" class="button_submit" onclick="verifypayment()" id="verify" >Verify</button>
+					<p><input type="submit" name="dp" value="Submit" id="submit" hidden/></p>
+				</div>
+			</form>
+			{% endfor %}
+		    </div>
+		</div>     
+	</div>
+
+
+<script>
+	function verifypayment(){
+		let amount = document.querySelector("input[type='number'][name=amount_paid]").value;
+		let dp = document.querySelector("input[type='aa'][name=dp]").value;
+		let pic = document.querySelector("input[type='file'][name=proof_receipt]").value;
+		console.log(pic)
+		console.log(dp)
+		console.log(amount)
+		if(!pic){
+			alert("Please upload your Proof of Receipt")
+		}
+		else if(parseFloat(dp) > parseFloat(amount)){
+			alert("Your payment must be equal to or greater than the required downpayment (Php. " +dp + " )")
+		}
+		else{
+			document.getElementById("submit").removeAttribute("hidden")
+			document.getElementById("verify").setAttribute("hidden", true)
+		}
+	}
+
+</script>
+
+{% endblock %}

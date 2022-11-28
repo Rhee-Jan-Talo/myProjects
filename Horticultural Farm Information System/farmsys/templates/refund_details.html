@@ -1,0 +1,92 @@
+{% extends 'navbar.html' %} 
+{% block content %}{% load filters %}
+<center><h1>Refund Details</h1></center>
+
+	<main>
+		<form class="cool_form-r" method="POST" enctype="multipart/form-data">{% csrf_token %}
+		<div class="details-container">
+		     <div class="details-container-left"> 
+		     	{% for things in data %}
+		     	<center><p style="font-size: 17px;">Refund Request Details</p></center><hr>
+		     	<p>Transaction ID: <b><u>{{things.purchase_history_id}}</u></b></p>
+		     	<p>Order ID: <b><u>{{things.u_order_id}}</u></b></p>
+		     	<p>Plant Name: <b>{{things.plant_name}}</b></p>
+		     	<p>Quantity Delivered: <b>{{things.quantity |stringformat:".0f"}} {{ things.units }}</b></p>
+		     	<p>Received Quantity: <b>{{ things.quantity_received}} {{ things.units }}</b></input></p>
+		     	<p>Returned Quantity: <b><u>{{ things.returned_quantity }} {{ things.units }}</u></b></input></p>
+		     	
+		     	<p>Reason for Refund: <b><u>{{ things.reason_for_refund }}</u></b></p>      
+		     	
+
+		     	
+		     	<p>See your submitted proof for refund<a href="{{ things.proof_refund }}" download> <u> here</u></a></p>
+		     	<p>Request Date: <b>{{things.request_date|date_format }}</b></p>
+		     	{% if things.is_accepted == 1 %}
+		    		<p>Admin Status: <b>Accepted</b></p>
+		    	{% elif things.is_accepted == 3 %}
+		    		<p>Admin Status: <b style="color: red"><u>Declined</u></b></p>
+		    		<p>Reason: <b style="color: red"><u>{{ things.reason_decline }}</u></b></p>
+		    	{% else %}
+		    		<p>Admin Status: <b>No response yet</b></p>
+		    	{% endif %}	
+		    	
+
+		    	<center><p style="font-size: 17px;">Refund Details</p></center><hr>
+		    	<p>The refund you will get for this order will be calculated by this formula: </p>
+		    	<p><b>(Units Returned ÷ Units Purchased) x 60</b></p>
+		    	<p>Ex: (5 units ÷ 100 units) x 60 = <b>3% of the total product price</b></p>
+		    	<p>Total Product Price: <b>{{ things.total_amount|money_format }}</b></p>
+		    	<p>Quantity Returned: <b>{{ things.returned_quantity }} {{ things.units }}</b></p>
+		    	<p>Refund Percentage: <b>{{ things.returned_quantity|calc_refund_p:things.quantity }}</b></p>
+		    	<p>Refund Amount: <b>{% calc_rf things.total_amount things.returned_quantity things.quantity %}</b></p>
+		    	{% if things.refund_status == 1 %}
+		    		{% for things2 in payment_methods_for_refund %}
+		    		<hr>
+			    	<p>Refund Status: <b>{{ things.refund_status|status_format }}</b></p>
+			    	<p>Payment Method: <b>{{ things2.payment_method }}</b></p>
+			    	<p>Refund Amount: <b>{{ things.refund_amount|money_format }}</b></p>
+			    	<p>Date of Refund: <b>{{ things.date_of_refund|date_format }}</b></p>
+			    	<p>Click this <a href="{{ things2.proof_receipt }}" download> <u>link</u></a> for the receipt of the refund</p>
+			    	{% endfor %}
+
+
+		    	{% else %}
+
+		    	<p><i style="color: red;">Admin did not send any payment for this refund yet please wait..</i></p>
+		    	{% endif %}
+		     </div>
+		     <div class="details-container-right">
+		     		<br><br><br>
+			    	<img class="img-container" src="{{things.batch_img_imgur}}" >
+			    	<center><p style="font-size: 17px;">Submitted Payment methods</p></center><hr>
+			    	
+			    	<div class="table-items-smol">
+						<table class="table-striped">
+							<thead>
+							    <tr>
+							     	<th>Payment Method</th>
+							     	<th>Account Name</th>
+							     	<th>Acccount Number</th>
+							     </tr>
+							</thead>
+							{% for i in payment_methods %}
+							<tbody>
+							    <tr>
+							     	<td>{{i.payment_method}}</td>
+							     	<td>{{i.account_name}}</td>
+							     	<td>{{i.account_number}}</td>
+							     </tr>
+							</tbody>
+							{% endfor %}
+						</table>
+					</div>	
+					
+
+		     </div>
+		     {% endfor %}
+		</div>
+		</form>
+	</main>
+
+
+{% endblock %}

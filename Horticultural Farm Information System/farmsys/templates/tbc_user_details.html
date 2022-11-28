@@ -1,0 +1,161 @@
+{% extends 'navbar.html' %} 
+{% block content %}
+{% load filters %}
+
+
+<div >
+{% for message in messages %}
+{% if message %}
+<script>alert("{{ message }}");</script>
+{% endif %}
+{% endfor %}
+</div>
+
+
+<center><h1>To be confirmed by User</h1></center>
+<main>
+	{% for things in data %}
+	<div class="details-container">
+		<div class="details-container-left"> 
+			<br>
+			<p>Order ID: <b>{{ things.u_order_id }}</b></p>
+		    <p>Plant Name: <b>{{ things.plant_name }}</b></p>
+		    <p>Confirmed Quantity: <b>{{ things.confirmed_quantity }}</b></p>
+		    <p>Units: <b>{{ q_data.units }}</b></p>
+		    <p>Price per unit: <b>Php. {{ q_data.price_per_unit|money_format }}</b></p>
+		    <p>Product Total Price: <b>{{ things.total_amount|money_format }}</b></p>
+		    <p>Delivery fee: <b>{{ things.delivery_fee|money_format }}</b></p>
+		    <p>Total Amount: <b> {{ things.delivery_fee|add:things.total_amount|money_format }}</b></p>
+		    <p>Total Down Payment: <b>{{ things.total_downpayment|money_format }}</b></p>
+		    <p>Down payment due: <b> {{ things.dp_due|date_format }}</b></p>
+
+			<p>Expected Delivery arrival: <b>{{ things.expected_date_arrival|date_format }}</b></p>
+			<p>Requested Delivery arrival : <b>{{ things.date_needed|date_format }}</b></p>
+
+			
+			
+			
+
+
+			
+			<p>Available payment methods: (CLICK TO SEND PAYMENT)</p>
+			<p><i style="color: red">Note: <br>*You can only choose 1 payment method for paying. <br>*Upon submitting your payment you must wait for the <br>admin to confirm the amount of money you sent<br>*We will only process the order once Downpayment is Paid <br>*We will deliver the product if and only if you paid the full amount<br>*Click the "Confirm Purchase" button once you paid the downpayment so that we will start processing your order</i></p>
+
+			{% if paid == True %}
+				{% for things2 in payment_methods %}
+					{% if things2.is_selected == 1 %}
+						<p>You Paid using: <b>{{things2.payment_method}}</b></p>	
+						<p>Total amount paid: <b>{{things2.total_amount_paid|money_format }}</b></p>				
+						<p>Total Amount Payable left: <b> {{ things.balance_to_pay|money_format }}</b></p>		
+						{% if things.fp_paid == "0" %}	
+						<p><a href="{% url 'payment' things2.payment_method things2.p_id %}" class="tabular_button-notopmargin">Make another payment using {{ things2.payment_method }}</a></p>
+						<p><a href="{% url 'view_payment_done' things2.p_id %}" class="tabular_button-notopmargin">Click here to View your Payment details</a></p>		
+						{% endif %}			
+						{% if things2.total_amount_paid|to_float >= things.total_downpayment|to_float %}
+						<p>Down Payment Status: <b>PAID</b></p>
+						{% if things.balance_to_pay|to_float <= 0 %}
+						<p>Full Payment Status: <b>PAID </b></p>
+						{% else %}
+						<p>Full Payment Status: <b>NOT ENOUGH PAYMENT</b></p>
+						{% endif %}
+						<p style="margin-top:40px;"><a href="{% url 'confirm_user'  things.f_order_id %}" class="tabular_button-nomargins">Confirm Purchase</a></p>
+						{% else %}
+						<p>Down Payment Status: <b>NOT ENOUGH PAYMENT</b></p>
+						<p>Full Payment Status: <b>NOT ENOUGH PAYMENT</b></p>
+						<p><i style="color:red;">You can only confirm this order once you paid your Down Payment</i></p>
+						{% endif %}
+					{% endif %}
+				{% endfor %}
+			{% else %}
+				{% if payment_methods %}
+					{% for things4 in payment_methods %}
+						<a href="{% url 'payment' things4.payment_method things4.p_id %}" class="tabular_button-nomargins">{{ things4.payment_method }}</a>
+					{% endfor %}
+				{% else %}
+					<p><i style="color: red">No payment methods available for this order yet.<br>Please wait for the admin to input the payment methods</i></p>
+				{% endif %}
+			{% endif %}
+
+			
+			
+
+		</div>     
+
+		<div class="details-container-right">
+			<p><img class="img-container" src="{{ things.batch_img_imgur }}" ></p>
+			<br>
+			<p style="color: red">ORDER WILL BE CANCELLED AUTOMATICALLY IF DOWN PAYMENT IS NOT PAID BY: <b>{{ things.dp_due|date_format }}</b> <br><br>UPON CANCELLATION, YOU WILL GET THE RESPECTIVE AMOUNT OF REFUND ON THE DATE OF CANCELLATION BASED IN THE TABLE BELOW</p>
+			
+			
+			{% if refunds %}
+			<div class="table-items">
+		    <table class="table-striped">
+			    <thead>
+			     	<tr>
+			     		<th>Refund %</th>
+			     		<th>Date From</th>
+			     		<th>Date To</th>
+			     	</tr>
+			     </thead>
+			     {% for things in refunds %}
+			     <tbody>
+			     	<tr>
+			     		<td>{{ things.refund_percentage }}</td>
+			     		<td>{{ things.date_from|date_format }}</td>
+			     		<td>{{ things.date_to|date_format }}</td>
+			     	</tr>
+			     </tbody>
+			     {% endfor %}
+			    </table>
+		    </div>
+		    {% else %}
+		    <p><i style="color: red">No Refund Details available for this order yet.
+		    	<br>Please wait for the admin to input the Refund
+		    	<br>Details upon cancellcation</i></p>
+		    {% endif %}
+		    <form class="cool_form-l" method="POST" onsubmit="return confirm('WARNING: ACTION CANNOT BE UNDONE');">{% csrf_token %}<br><br>
+		     	<input type="description" placeholder="Cancel Reason" name="reason" required></input>
+		     	<button type="submit" class="tabular_button-nomargins">Cancel Order</button>
+		    </form>
+		    <br>
+		
+			
+		    </div>
+		</div>
+	</div>
+	{% endfor %}
+</main>
+
+
+
+
+
+
+
+{%endblock%}
+
+<!--
+			{% if paid == True %}
+				{% for things2 in payment_methods %}
+					{% if things2.is_selected == 1 %}
+						
+						{% if things2.payment_for == 'Full Payment' %}
+						<p>You Paid for: <b>{{things2.payment_for}}</b>using: <b>{{things2.payment_method}}</b></p>
+						<p>Total payment: <b>Php. {{ things2.amount_paid}}</b></p>
+						{% else %}
+						<p>You Paid using: <b>{{things2.payment_method}}</b></p>
+						<p>Total payment: 
+						{% if things2.is_confirmed == 1%}
+						<b>{{ things2.amount_paid|money_format }}</b>(Admin confirmed)
+						{% else %}
+						{{ things2.amount_paid|money_format }} (Admin needs to confirm this payment)
+						{% endif %}
+						</p>
+						<a href="{% url 'payment' things2.payment_method things2.p_id %}" class="tabular_button-nomargins">Make another payment using {{ things2.payment_method }}</a>
+						{% endif %}
+						<p>Download your proof of payment<a href="{{ things2.proof_receipt }}" download> <u> here</u></a></p>
+						<p style="margin-top:40px;"><a href="{% url 'confirm_user'  things.f_order_id %}" class="tabular_button-nomargins">Confirm Purchase</a></p>
+					{% endif %}
+				{% endfor %}
+			{% endif %}
+			-->

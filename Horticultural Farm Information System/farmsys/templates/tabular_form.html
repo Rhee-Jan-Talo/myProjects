@@ -1,0 +1,331 @@
+{% extends 'navbar.html' %} 
+{% block content %}
+{% load filters %}
+
+<style>
+th{
+	font-size: 18px;
+}
+.right{float: right; margin-right: 45px; display: block;}
+</style>
+<br><br><br>
+<div style="" class="cool_form-r right">
+<input type="text" id="myInput" onkeyup="myFunction()" placeholder="Search for plant name..." title="Type in a name"><i class="fa fa-search" aria-hidden="true"></i>
+</div>
+<br><br><br>
+{% if t_type == 'tbc_admin' %}
+
+<div class="table-items-tabular">
+	<table class="table-striped" id="myTable">
+		<thead>
+			<tr>
+			    <th>Order ID</th>
+			    <th>Plant Name</th>
+			    <th>Requested Quantity</th>
+
+			    <th>Price per Unit</th>
+			    <th>Total Amount</th>
+			    <th>Requested Delivery Date</th>
+			    <th>Admin Status</th>
+			    <th>Request Date</th>
+			    <th>Action</th>
+			</tr>
+		</thead>
+
+		{% for things in data %}
+		<tbody>
+			<tr>
+			    <td>{{ things.u_order_id }}</td>
+			    <td>{{ things.plant_name }}</td>
+			    <td>{{ things.quantity|floatformat:0 }} {{ things.units }}</td>
+
+			    <td>{{ things.price_per_unit|floatformat:2|money_format }}</td>
+			    <td>{{ things.quantity|total_redelivery_loss:things.price_per_unit|money_format }}</td>
+			    <td>{{ things.date_needed|date_format }}</td>
+			    <td>{{ things.is_admin_approved|is_confirm2 }}</td>
+
+			    <td>{{ things.order_request_date|date_format }}</td>
+			    <td>Click <a href="{% url 'tbc_admin_details' things.u_order_id %}" ><u><b>here</b></u></a> to show full details</td>
+			</tr>
+		</tbody>
+		{% endfor %}
+	</table>
+</div>
+{% endif %}
+
+{% if t_type == 'cancelled_orders' %}
+
+<div class="table-items-tabular">
+	<table class="table-striped" id="myTable">
+		<thead>
+			<tr>
+			    <th>Order ID</th>
+			    <th>Plant Name</th>
+			    <th>Confirmed Quantity</th>
+			    <th>Total Amount</th>
+			    <th>Total Amount Paid</th>
+
+			    <th>Cancellation Date</th>
+			    <th>Reason</th>
+			    <th>Cancellation Refund</th>
+			    <th>Refund Status</th>
+			    <th>Action</th>
+			    
+			</tr>
+		</thead>
+		{% for things in data %}
+		<tbody>
+			<tr>
+			    <td>{{ things.u_order_id }}</td>
+			    <td>{{ things.plant_name }}</td>
+			    <td>{{ things.quantity|floatformat:0 }} {{ things.units }}</td>
+			    <td>{{things.total_amount|add:things.delivery_fee|money_format }}</td>
+			    <td>{{things.total_amount_paid|money_format}}</td>
+
+			    <td>{{things.cancel_date|date_format}}</td>
+			    <td>{{ things.cancel_reason }}</td>
+			    <td>{{ things.cancel_refund_amount|money_format }}</td>
+			    <td>{{ things.refund_date|is_confirm }}</td>
+			    <td>Click <a href="{% url 'cancelled_orders_details' things.f_order_id %}" ><u><b>here</b></u></a> to show full details</td>
+			    
+			</tr>
+		</tbody>
+		{% endfor %}
+	</table>
+</div>
+{% endif %}
+
+{% if t_type == 'tbc_user' %}
+
+<div class="table-items-tabular">
+	<table class="table-striped" id="myTable">
+		<thead>
+			<tr>
+			    <th>Order ID</th>
+			    <th>Plant Name</th>
+			    <th>Confirmed Quantity</th>
+			    <th>Total Amount</th>
+			    <th>Total Down Payment</th>
+			    <th>Down Payment Due</th>
+			    <th>Requested Delivery Date</th>
+			    <th>Expected Delivery Date</th>
+			    
+			    <th>Action</th>
+			</tr>
+		</thead>
+		{% for things in data %}
+		<tbody>
+			<tr>
+			    <td>{{ things.u_order_id }}</td>
+			    <td>{{ things.plant_name }}</td>
+			    <td>{{ things.confirmed_quantity }} {{ things.units }}</td>
+			    <td>{{things.total_amount|money_format }}</td>
+			    <td>{{things.total_downpayment|money_format }}</td>
+			    <td>{{things.dp_due|date_format }}</td>
+			    <td>{{ things.date_needed|date_format }}</td>
+			    <td>{{ things.expected_date_arrival|date_format }}</td>
+			    
+			    <td>Click <a href="{% url 'tbc_user_details' things.u_order_id %}" ><u><b>here</b></u></a> to show full details</td>
+			</tr>
+		</tbody>
+		{% endfor %}
+	</table>
+</div>
+{% endif %}
+
+{% if t_type == 'sales_order' %}
+
+<div class="table-items-tabular">
+	<table class="table-striped" id="myTable">
+		<thead>
+			<tr>
+			    <th>Order ID</th>
+			    <th>Plant Name</th>
+			    <th>Confirmed Quantity</th>
+
+			    <th>Total Amount</th>
+			    <th>Total Amount Paid</th>
+			    <th>Delivery Status</th>
+			
+			    <th>Expected Delivery Date</th>
+			    <th>Delivery Info</th>
+			    <th>Action</th>
+			</tr>
+		</thead>
+		{% for things in data %}
+		<tbody>
+			<tr>
+			    <td>{{ things.u_order_id }}</td>
+			    <td>{{ things.plant_name }}</td>
+			    <td>{{ things.quantity|floatformat:0 }} {{ things.units }}</td>
+
+			    <td>{{things.total_amount|add:things.delivery_fee|money_format }}</td>
+			    <td>{{things.total_amount_paid|money_format }}</td>
+
+			    <td>{{ things.delivery_status }}</td>
+
+			  
+			    <td>{{ things.expected_date_arrival|date_format }}</td>
+
+			    <td>Click <a href="{% url 'delivery_info' things.f_order_id %}"><u>here</u></a> to see delivery info </td>
+			    <td>Click <a href="{% url 'sales_order_details' things.f_order_id %}" ><u><b>here</b></u></a> to show full details</td>
+			</tr>
+		</tbody>
+		{% endfor %}
+	</table>
+</div>
+{% endif %}
+
+{% if t_type == 'success_orders' %}
+
+<div class="table-items-tabular">
+	<table class="table-striped" id="myTable">
+		<thead>
+			<tr>
+			    <th>Order ID</th>
+			    <th>Plant Name</th>
+			    <th>Confirmed Quantity</th>
+			
+			    <th>Total Amount Paid</th>
+			    <th>Payment Method</th>
+
+			    <th>Date Arrived</th>
+			    <th>Feedback</th>
+			    <th>Action</th>
+			   
+			</tr>
+		</thead>
+		{% for things in data %}
+		<tbody>
+			<tr>
+			    <td>{{ things.u_order_id }}</td>
+			    <td>{{ things.plant_name }}</td>
+			    <td>{{ things.quantity|floatformat:0 }} {{ things.units }}</td>
+			    <td>{{ things.total_amount_paid|money_format }}</td>
+			    <td>{{things.payment_method}}</td>
+
+
+
+			    <td>{{ things.date_arrived|date_format }}</td>
+			    <td>{{things.feedback}}</td>
+			    <td>Click <a href="{% url 'success_orders_details' things.f_order_id %}" ><u><b>here</b></u></a> to show full details</td>
+
+			    
+			</tr>
+		</tbody>
+		{% endfor %}
+	</table>
+</div>
+{% endif %}
+
+{% if t_type == 'redelivery' %}
+
+<div class="table-items-tabular">
+	<table class="table-striped" id="myTable">
+		<thead>
+			<tr>
+			    <th>Order ID</th>
+			    <th>Plant Name</th>
+			    <th>Quantity Received</th>
+			    <th>Quantity Returned</th>
+			    <th>Reason for Redelivery</th>
+			    <th>Proof of Damage</th>
+			  
+			    <th>Redelivery Status</th>
+			
+			    <th>Request Date</th>
+			    <th>Action</th>
+			</tr>
+		</thead>
+		{% for things in data %}
+		<tbody>
+			<tr>
+			    <td>{{things.u_order_id}}</td>
+			    <td>{{things.plant_name}}</td>
+			    <td>{{things.quantity|floatformat:0 }} {{things.units}}</td>
+			    <td>{{things.returned_quantity|floatformat:0 }} {{things.units}}</td>
+			    <td>{{things.reason_for_redelivery}}</td>
+			    <td>Click to <a href="{{ things.proof_img }}" download> <u>Download</u></td>
+
+			    
+			    <td>{{ things.is_accepted|accept_format }}</td>
+
+		
+			    <td>{{ things.request_date|date_format }}</td>
+			    <td>Click <a href="{% url 'redelivery_details' things.purchase_history_id %}" ><u><b>here</b></u></a> to show full details</td>
+			</tr>
+		</tbody>
+		{% endfor %}
+	</table>
+</div>
+{% endif %}
+
+{% if t_type == 'refund' %}
+
+<div class="table-items-tabular">
+	<table class="table-striped" id="myTable">
+		<thead>
+			<tr>
+			    
+			    <th>Order ID</th>
+			    <th>Plant Name</th>
+			    <th>Quantity Received</th>
+			    <th>Quantity Returned</th>
+			   
+			    <th>Reason for Refund</th>
+			    <th>Proof of Damage</th>
+			    <th>Refund Status</th>
+			    <th>Request Date</th>
+			    <th>Action</th>
+			</tr>
+		</thead>
+		{% for things in data %}
+		<tbody>
+			<tr>
+			    
+			    <td>{{things.u_order_id }}</td>
+			    <td>{{things.plant_name}}</td>
+			    <td>{{things.quantity |floatformat:0 }} {{things.units}}</td>
+			    <td>{{things.returned_quantity|floatformat:0 }} {{things.units}}</td>
+			    <td>{{things.reason_for_refund}}</td>
+			    <td>Click to <a href="{{ things.proof_refund }}" download> <u>Download</u></td>
+
+				<td>{{ things.refund_status|accept_format }}</td>
+
+			    
+		    	<td>{{ things.request_date|date_format }}</td>
+		    	<td>Click <a href="{% url 'refund_details' things.refund_id %}" ><u><b>here</b></u></a> to show full details</td>
+
+
+			</tr>
+		</tbody>
+		{% endfor %}
+	</table>
+</div>
+{% endif %}
+
+
+<script>
+function myFunction() {
+  var input, filter, table, tr, td, i, txtValue;
+  input = document.getElementById("myInput");
+  filter = input.value.toUpperCase();
+  table = document.getElementById("myTable");
+  tr = table.getElementsByTagName("tr");
+  for (i = 0; i < tr.length; i++) {
+    td = tr[i].getElementsByTagName("td")[1]; /* ADJUST LANG TO WHICH ROW*/
+    if (td) {
+      txtValue = td.textContent || td.innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        tr[i].style.display = "";
+      } else {
+        tr[i].style.display = "none";
+      }
+    }       
+  }
+}
+</script>
+
+
+{% endblock %}
+

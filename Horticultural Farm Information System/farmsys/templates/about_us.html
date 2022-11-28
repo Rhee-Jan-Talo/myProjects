@@ -1,0 +1,31 @@
+{% extends 'navbar.html' %} 
+{% block content %}{% load filters %}
+
+<style>
+	.little_left{
+		margin-left: 170px;
+	}
+	.img-container{
+		width: auto;
+		height: auto;
+	}
+</style>
+
+<center><h2>About Us</h2></center>
+
+<center><img class="img-container"src="{{ org_chart_imgur }}"></center>
+<div class="details-container">
+	<div class="details-container-left"> 
+		<br>
+		<p><b>For inquires and Order<br> adjustments please contact: </b></p>
+		{% for things in data%}
+		<div class="little_left">
+			<p>Name: <b>{{ things.contact_person_name }} </b></p> 
+			<p>Position: <b>{{ things.position }} </b></p> 
+			<p>Contact Number: <b>{{ things.contact_num }} </b></p> 
+			<p>Contact Email: <b>{{ things.contact_email }} </b></p> 
+		<hr></div>
+		{% endfor %}
+	</div>
+</div>
+{%endblock%}

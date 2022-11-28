@@ -1,0 +1,69 @@
+{% extends 'navbar.html' %} 
+{% block content %}{% load filters %}
+<div >
+{% for message in messages %}
+{% if message %}
+<script>alert("{{ message }}");</script>
+{% endif %}
+{% endfor %}
+</div>
+<style>
+input{text-indent: 5px;width: 260px !important;}.right{float: right; margin-right: 45px;}
+</style>
+<center><h2>Order History</h2></center>
+<center><p>Cancelled Orders</p></center>
+
+
+
+<main class="container-d" >
+{% if data %}
+<a href="{% url 'tabular_form' 'cancelled_orders' %}" class="tabular_button">View in Tabular Form</a>
+
+<div style="" class="cool_form-r right">
+<input type="text" id="myInput" onkeyup="myFunction()" placeholder="Search for plant names, reasons, dates.." title="Type in a name"><i class="fa fa-search" aria-hidden="true"></i>
+</div>
+<br><br>
+
+    <div class="d-flex flex-wrap" id="myTable">
+    	{% for things in data %}
+    	<div class="items">
+	    <a class="click-dis" href="{% url 'cancelled_orders_details' things.f_order_id %}">
+	    <div class="i-container">
+		    <div class="main-title">
+		    	<img src={{things.batch_img_imgur}} height="180x">
+		    	<p class="main-title"> {{things.plant_name}}</p>
+		    </div>
+		    <div class ="sub-details">
+		    	<p>Reason: <b>{{ things.cancel_reason }}</b></p>
+		    	<p>Date Cancelled: <b>{{ things.cancel_date|date_format }}</b></p>
+		    </div>     
+	    </div> 
+	    </a> 
+		</div>
+	    {% endfor %}
+
+	</div>  
+{% else %}
+<center>--- No cancelled orders ---</center>
+{% endif %}
+</main>   
+<script>
+function myFunction() {
+  var input = document.getElementById("myInput");
+  var filter = input.value.toLowerCase();
+  var nodes = document.getElementsByClassName('items');
+  for (i = 0; i < nodes.length; i++) {
+    if (nodes[i].innerText.toLowerCase().includes(filter)) {
+      nodes[i].style.display = "block";
+    } else {
+      nodes[i].style.display = "none";
+    }
+  }
+}
+</script>
+{%endblock%}
+
+
+
+
+

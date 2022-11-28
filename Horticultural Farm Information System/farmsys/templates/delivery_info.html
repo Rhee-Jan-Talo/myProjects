@@ -1,0 +1,53 @@
+{% extends 'navbar.html' %} 
+{% block content %}
+
+<main>
+
+	<div class="details-container">
+		<br><br><br>
+		<div class="details-container-left"> 
+		{% for things in data %}
+		{% if is_paid %}
+		<center><h3>Delivery Info</h3></center>
+		<hr>
+		<p>Full payment Status: <b>Paid</b></p>
+		{% else %}
+		<p>Full payment Status: <b>Not enough Payment</b></p>
+		<p><i style="color: red">Note: This order will not be delivered unless you paid it fully</i></p>
+		{% endif %}
+			<p>Order ID: <b>{{things.u_order_id}}</b></p>
+		    <p>Plant Name: <b>{{things.plant_name}}</b></p>
+		    <p>Delivery status: <b>{{ things.delivery_status}}</b></p>
+		    
+
+		    <p>Details: </p>
+		    <div class="desc-box-outer">
+		     		<div class="desc-box-inner"><b>
+		     			{% load filters %}
+		     			{% with things.details|split:";" as details %}
+		     			{% for stuff in details %}
+		     			<p>{{stuff}}</p>
+		     			{% endfor %}
+		     			{% endwith %}
+		     			
+		     		</b></div>
+		     	</div>
+		    {% if things.date_arrived %}
+		    	<p>Date Arrived: <b>{{ things.date_arrived|date_format }}</b></p>
+		    {% else %}
+		    	<p>Date Arrived: <b>N/A</b></p>
+		    {% endif %}
+		    <br><hr>
+	        <center><p><b>Customer Information</b></p></center>
+		    <p>Customer Name: <b>{{ things.customer_name }}</b></p>
+		    <p>Contact Info: <b>{{ things.contact_info }}</b></p>
+
+		    <p>Shipping Address: <b>{{ things.shipping_address }}</b></p><br>
+		</div>
+		
+		{% endfor %}
+	</div>
+</main>
+
+
+{%endblock%}

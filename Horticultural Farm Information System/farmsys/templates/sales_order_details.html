@@ -1,0 +1,99 @@
+{% extends 'navbar.html' %} 
+{% block content %}
+{% load filters %}
+<center><h1>Sales Order</h1></center>
+<main>
+
+	{% for things in data %}
+	<div class="details-container">
+		<div class="details-container-left"> 
+			<p>Order ID: <b>{{ things.u_order_id }}</b></p>
+		    <p>Plant Name: <b>{{ things.plant_name }}</b></p>
+		    <p>Quantity: <b>{{ things.confirmed_quantity }}</b></p>
+		    <p>Units: <b>{{ things.units }}</b></p>
+		   	<p>Price per unit: <b>Php. {{ things.price_per_unit|money_format }}</b></p>
+		   	<p>Product Total Price: <b>{{ things.total_amount|money_format }}</b></p>
+		   	<p>Delivery fee: <b>{{ things.delivery_fee|money_format }}</b></p>
+		    <p>Total Amount: <b> {{ things.delivery_fee|add:things.total_amount|money_format }}</b></p>
+		    <p>Expected Delivery arrival: <b>{{ things.expected_date_arrival|date_format }}</b></p>
+			<p>Requested Delivery arrival : <b>{{ things.date_needed|date_format }}</b></p>
+
+			{% if delivery_info %}
+		    <p>Delivery status: Click <a href="{% url 'delivery_info' things.f_order_id %}"><u>here </u></a>to see delivery info </p>
+		    {% else %}
+		    <p><i style ="color:red">No delivery info available for this order yet, please wait for the admin input for this</i></p>
+		    {% endif %}
+
+		    <hr>
+		    <center><b>Payment Informations</b></center>
+		    {% if things.fp_paid|to_float == 1 %}
+				<p>Full Payment Status: <b>PAID</b></p>
+			{% else %}
+				<p><i style="color: red">Note: This order will not be delivered unless you paid it fully</i></p>
+			{% endif %}	
+		    <p>You Paid using: <b>{{things.payment_method}}</b></p>	
+			<p>Total amount paid: <b>{{things.total_amount_paid|money_format }}</b></p>				
+			<p>Total Amount Payable left: <b> {{ things.balance_to_pay|money_format }}</b></p>
+			{% if things.dp_paid|to_float == 1 %}
+			<p>Down Payment Status: <b>PAID</b></p>	
+			{% else %}
+			<p>Down Payment Status: <b>NOT ENOUGH PAYMENT</b></p>	
+			{% endif %}
+
+			{% if things.fp_paid|to_float == 1 %}
+			<p>Full Payment Status: <b>PAID</b></p>	
+			{% else %}
+			<p>Full Payment Status: <b>NOT ENOUGH PAYMENT</b></p>	
+			{% endif %}
+			
+			
+		    <hr>
+
+		    <center><b>Payments Done</b></center>
+		    <p><a href="{% url 'view_payment_done' things.p_id %}" class="tabular_button-notopmargin">Click here to View your Payment details</a></p>
+		    
+			{% if things.fp_paid|to_float == 1 %}
+			<center><p><i style="color:red;">You completed your payment</i></p></center>
+			{% else %}
+			<br><p><a href="{% url 'payment' things.payment_method things.p_id %}" class="tabular_button-notopmargin">Make another payment using {{ things.payment_method }}</a></p>
+			{% endif %}
+			
+			{% endfor %}
+		</div>
+		<div class="details-container-right">
+			{% for things3 in data %}
+			<p><img class="img-container" src="{{ things3.batch_img_imgur }}" ></p>
+			{% endfor %}
+			<p style="color: red">UPON CANCELLATION, YOU WILL GET THE RESPECTIVE AMOUNT OF REFUND ON THE DATE OF CANCELLATION BASED IN THE TABLE BELOW</p>
+			<div class="table-items">
+		    <table class="table-striped">
+			    <thead>
+			     	<tr>
+			     		<th>Refund %</th>
+			     		<th>Date From</th>
+			     		<th>Date To</th>
+			     	</tr>
+			     </thead>
+			     {% for things in refunds %}
+			     <tbody>
+			     	<tr>
+			     		<td>{{ things.refund_percentage }}</td>
+			     		<td>{{ things.date_from|date_format }}</td>
+			     		<td>{{ things.date_to|date_format }}</td>
+			     	</tr>
+			     </tbody>
+			     {% endfor %}
+			    </table>
+		    </div>
+			<form class="cool_form-l" method="POST">{% csrf_token %}
+		     	<input type="description" placeholder="Cancel Reason" name="reason" required></input>
+		     	<button type="submit" class="tabular_button-nomargins"> Cancel Order</button>
+		    </form>
+		</div>
+
+	</div>
+</main>
+
+
+
+{%endblock%}
