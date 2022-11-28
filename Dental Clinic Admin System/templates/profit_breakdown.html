@@ -1,0 +1,50 @@
+{% extends 'base.html' %} {% block content %}
+
+
+
+<h1 class="page_header">Item Profit</h1>
+<div class="some_space"></div>
+<table class ='table_form'>
+	<thead>
+		<tr class="tr_form">
+			<th class="th_form">Item Name</th>
+			<th class="th_form">Barcode</th>
+			<th class="th_form">Item Category</th>
+			<th class="th_form">Selling Price</th>
+			<th class="th_form">Total Quantity</th>
+			<th class="th_form">Total Quantity Sold</th>
+			<th class="th_form">Total Gross Income</th>
+			<th class="th_form">Purchase Price</th>
+			<th class="th_form">Total Net Income</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for things in item_details %}
+		<tr class="tr_form">
+			<td class="td_form" data-label="Patient Name">{{ things.itemname }}</td>
+			<td class="td_form" data-label="Medicine Bought">{{ things.barcode }}</td>
+			<td class="td_form" data-label="Medicine Bought">{{ things.itemcategory }}</td>
+
+			<td class="td_form" data-label="Barcode">{{ things.item_fee }}</td>
+			<td class="td_form" data-label="Medicine Bought">{{ things.all_quan }}</td>
+			<td class="td_form" data-label="Quantity">{{ things.tot_quan }}</td>
+			<td class="td_form" data-label="Units">{{ things.tot_amount }}</td>
+			
+			{% if things.srp %}
+			<td class="td_form" data-label="Total Payment">Php. {{ things.srp }}</td>
+			{% else %}
+			<td class="td_form" data-label="Total Payment">Php. 0.00</td>
+			{% endif %}
+			{% if things.net_income %}
+			<td class="td_form" data-label="Payment Method">Php. {{ things.net_income }}</td>
+			{% else %}
+			<td class="td_form" data-label="Total Payment">Php. 0.00</td>
+			{% endif %}
+		</tr>
+		{% endfor %}
+	</tbody>
+	</table>
+	<center><h3 class = 'page_header'><u>Total Profit for Items Sold/Used: Php. {{ profit }}</u></h3></center>
+
+
+{% endblock %}
